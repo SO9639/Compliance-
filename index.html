@@ -1,0 +1,3006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRA Assessment Tool - Comprehensive AI & Compliance Assessment</title>
+    <meta name="description" content="Comprehensive compliance assessment tool for HIPAA, GDPR, CRA, AI GRC, California/Texas/Colorado AI laws, IEEE EAD, OWASP LLM, and more. 19 frameworks, 562+ assessment items.">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #0dcaf0;
+            --purple-color: #6f42c1;
+        }
+        
+        body { 
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0d6efd 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .framework-card { 
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .framework-card:hover { 
+            transform: translateY(-8px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .framework-card .card-body {
+            padding: 2rem;
+        }
+        
+        .framework-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .assessment-item { 
+            border: none;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            padding: 1.5rem;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .assessment-item:hover { 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .progress-circle { 
+            width: 80px; 
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: white;
+        }
+        
+        .badge-critical { background: linear-gradient(45deg, var(--danger-color), #e85d75); }
+        .badge-high { background: linear-gradient(45deg, var(--warning-color), #ffda6a); }
+        .badge-medium { background: linear-gradient(45deg, var(--info-color), #6edff6); }
+        .badge-low { background: linear-gradient(45deg, var(--success-color), #20c997); }
+        .badge-purple { background: linear-gradient(45deg, var(--purple-color), #9f7aea); }
+        
+        .hidden { display: none !important; }
+        
+        .completion-actions-card {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);
+            border: 2px solid #28a745;
+            box-shadow: 0 8px 30px rgba(40, 167, 69, 0.2);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        /* Force Logout Button */
+        .force-logout-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Authentication Styles */
+        .user-dropdown {
+            transition: all 0.3s ease;
+        }
+
+        .user-dropdown .nav-link {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 8px 16px;
+            margin-left: 8px;
+        }
+
+        .user-dropdown .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            border-radius: 12px;
+        }
+
+        .dropdown-item {
+            padding: 8px 20px;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        #loginModal .modal-content {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        #loginModal .modal-header {
+            border-radius: 15px 15px 0 0;
+            border-bottom: none;
+        }
+
+        .btn-demo {
+            transition: all 0.3s ease;
+        }
+
+        .btn-demo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        #loadingSpinner { 
+            position: fixed; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            z-index: 9999;
+            background: rgba(255,255,255,0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .btn-custom {
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .results-summary {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .compliance-status {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        
+        .status-compliant {
+            background: linear-gradient(45deg, var(--success-color), #20c997);
+            color: white;
+        }
+        
+        .status-warning {
+            background: linear-gradient(45deg, var(--warning-color), #ffda6a);
+            color: #212529;
+        }
+        
+        .status-danger {
+            background: linear-gradient(45deg, var(--danger-color), #e85d75);
+            color: white;
+        }
+        
+        .section-header {
+            background: linear-gradient(135deg, var(--primary-color), #0d6efd);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .framework-card .card-body {
+                padding: 1rem;
+            }
+            
+            .framework-icon {
+                font-size: 2rem;
+            }
+            
+            .assessment-item {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="text-center">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 h5">Loading Assessment Data...</p>
+        <p class="text-muted">Preparing 562+ compliance items across 19 frameworks</p>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#" onclick="showDashboard()">
+                <i class="fas fa-shield-alt me-2"></i>
+                <span class="fw-bold">CRA Assessment Tool</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="#" onclick="showDashboard()">
+                        <i class="fas fa-home me-1"></i> Dashboard
+                    </a>
+                    <a class="nav-link" href="#about" onclick="showAbout()">
+                        <i class="fas fa-info-circle me-1"></i> About
+                    </a>
+                    <li class="nav-item dropdown user-dropdown hidden" id="userDropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i>
+                            <span id="currentUserName">User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <h6 class="dropdown-header">
+                                    <i class="fas fa-user me-1"></i>Current User
+                                </h6>
+                            </li>
+                            <li><span class="dropdown-item-text" id="currentUserEmail">user@example.com</span></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="#" onclick="showLogoutModal()">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="loginModalLabel">
+                        <i class="fas fa-user-shield me-2"></i>CRA Assessment Tool - Login
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="username" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="password" required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()">
+                                    <i class="fas fa-eye" id="toggleIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="mt-4">
+                        <h6 class="text-muted mb-3">Demo Accounts:</h6>
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <button class="btn btn-outline-primary btn-sm w-100 mb-2" onclick="loginDemo('admin', 'admin123')">
+                                    <i class="fas fa-user-cog me-1"></i>Admin (admin/admin123)
+                                </button>
+                                <button class="btn btn-outline-success btn-sm w-100 mb-2" onclick="loginDemo('analyst', 'analyst123')">
+                                    <i class="fas fa-user-tie me-1"></i>Analyst (analyst/analyst123)
+                                </button>
+                                <button class="btn btn-outline-info btn-sm w-100" onclick="loginDemo('auditor', 'auditor123')">
+                                    <i class="fas fa-user-check me-1"></i>Auditor (auditor/auditor123)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="logoutModalLabel">
+                        <i class="fas fa-sign-out-alt me-2"></i>Confirm Logout
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to logout? Any unsaved progress will be lost.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning" onclick="confirmLogout()">
+                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Dashboard View -->
+        <div id="dashboardView">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="text-center">
+                        <h1 class="display-4 fw-bold text-primary mb-3">
+                            <i class="fas fa-shield-alt me-3"></i>
+                            Compliance & Risk Assessment Tool
+                        </h1>
+                        <p class="lead text-muted mb-4">
+                            Comprehensive assessment across 19 frameworks with 562+ compliance items including latest AI legislation
+                        </p>
+                        <div class="row text-center">
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="h2 text-primary fw-bold" id="totalFrameworks">19</div>
+                                <div class="text-muted">Frameworks</div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="h2 text-success fw-bold" id="totalItems">562</div>
+                                <div class="text-muted">Assessment Items</div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="h2 text-info fw-bold" id="completedAssessments">0</div>
+                                <div class="text-muted">Completed</div>
+                            </div>
+                            <div class="col-md-3 col-6 mb-3">
+                                <div class="h2 text-warning fw-bold" id="savedProgress">0</div>
+                                <div class="text-muted">In Progress</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Catalogue Upload Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-database me-2 text-info"></i>
+                                Smart Compliance Recommendations
+                            </h5>
+                            <p class="text-muted mb-3">Upload your data catalogue to get personalized compliance framework recommendations based on your data characteristics.</p>
+                            
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <input type="file" class="form-control" id="dataCatalogueUpload" 
+                                           accept=".csv,.json,.xlsx,.xls" 
+                                           onchange="handleDataCatalogueUpload(this)">
+                                    <small class="form-text text-muted">
+                                        Upload CSV, JSON, or Excel file with data description, region, classification, etc.
+                                    </small>
+                                </div>
+                                <div class="col-md-4">
+                                    <button class="btn btn-info w-100" onclick="showDataCatalogueTemplate()">
+                                        <i class="fas fa-file-download me-2"></i>
+                                        Download Template
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="dataCatalogueResults" class="mt-3 hidden">
+                                <!-- Analysis results will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h2 class="h3 mb-4">
+                        <i class="fas fa-list-check me-2"></i>
+                        Select Assessment Framework
+                    </h2>
+                </div>
+            </div>
+
+            <div class="row" id="frameworksContainer">
+                <!-- Frameworks will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Assessment View -->
+        <div id="assessmentView" class="hidden">
+            <div class="row mb-4">
+                <div class="col-lg-8">
+                    <button class="btn btn-outline-primary btn-custom mb-3" onclick="showDashboard()">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </button>
+                    <h2 id="assessmentTitle" class="h3 mb-3"></h2>
+                    <p id="assessmentDescription" class="text-muted mb-4"></p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="progress-circle mx-auto mb-3 bg-primary" id="progressCircle">
+                                0%
+                            </div>
+                            <h5>Progress</h5>
+                            <p class="text-muted mb-0">
+                                <span id="currentQuestion">0</span> of <span id="totalQuestions">0</span> completed
+                            </p>
+                            <button class="btn btn-success btn-custom mt-3" id="viewResultsBtn" onclick="showResults()" style="display: none;">
+                                <i class="fas fa-chart-line me-2"></i>View Results
+                            </button>
+                            <!-- Temporary test button for debugging -->
+                            <button class="btn btn-warning btn-sm mt-2" onclick="testCompletionActions()" title="Test completion actions">
+                                <i class="fas fa-bug me-1"></i>Test Complete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="assessmentContent">
+                <!-- Assessment questions will be loaded here -->
+            </div>
+            
+            <!-- Assessment Completion Actions -->
+            <div id="assessmentCompletionActions" class="hidden">
+                <div class="card mt-4 mb-4 completion-actions-card">
+                    <div class="card-body text-center">
+                        <h4 class="text-success mb-3">
+                            <i class="fas fa-check-circle me-2"></i>🎉 Assessment Complete!
+                        </h4>
+                        <p class="text-muted mb-4">All questions have been answered. What would you like to do next?</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <button class="btn btn-success btn-custom w-100" onclick="showResults()">
+                                    <i class="fas fa-chart-line me-2"></i>
+                                    View Results
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary btn-custom w-100" onclick="saveAssessment()">
+                                    <i class="fas fa-save me-2"></i>
+                                    Save Assessment
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-info btn-custom w-100" onclick="exportToCSV()">
+                                    <i class="fas fa-download me-2"></i>
+                                    Export to CSV
+                                </button>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-outline-secondary btn-custom w-100" onclick="startNewAssessment(currentFramework)">
+                                    <i class="fas fa-redo me-2"></i>
+                                    Start New
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results View -->
+        <div id="resultsView" class="hidden">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <button class="btn btn-outline-primary btn-custom mb-3" onclick="showDashboard()">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </button>
+                    <h2 class="h3 mb-4">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Assessment Results
+                    </h2>
+                </div>
+            </div>
+
+            <div class="results-summary" id="resultsContent">
+                <!-- Results will be displayed here -->
+            </div>
+        </div>
+
+        <!-- About View -->
+        <div id="aboutView" class="hidden">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <button class="btn btn-outline-primary btn-custom mb-3" onclick="showDashboard()">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </button>
+                    <h2 class="h3 mb-4">
+                        <i class="fas fa-info-circle me-2"></i>
+                        About CRA Assessment Tool
+                    </h2>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-shield-alt text-primary me-2"></i>
+                                Comprehensive Compliance Assessment
+                            </h5>
+                            <p class="card-text">
+                                This tool provides comprehensive compliance assessments across multiple frameworks including:
+                            </p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-primary">Core Compliance Frameworks</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success me-2"></i>AI Governance, Risk & Compliance (AI GRC)</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>EU Cyber Resilience Act (CRA)</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>EU AI Act</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>GDPR</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>HIPAA</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>ISO 42001 AI Management</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>NIST AI Risk Management</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>PCI DSS</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Responsible AI Framework</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>SOC 2 Type II</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-danger">🚀 NEW: AI Frameworks & Legislation</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-star text-warning me-2"></i>ISO/IEC 42001:2023 AIMS</li>
+                                        <li><i class="fas fa-star text-warning me-2"></i>IEEE Ethically Aligned Design</li>
+                                        <li><i class="fas fa-star text-warning me-2"></i>OWASP LLM Cybersecurity</li>
+                                        <li><i class="fas fa-star text-warning me-2"></i>IBM AI Governance Framework</li>
+                                        <li><i class="fas fa-star text-warning me-2"></i>US Federal AI Executive Orders</li>
+                                        <li><i class="fas fa-star text-warning me-2"></i>California AI Transparency Act</li>
+                                        <li><i class="fas fa-star text-warning me-2"></i>Colorado AI Protection Act</li>
+                                        <li><i class="fas fa-star text-warning me-2"></i>Texas AI Governance Act</li>
+                                        <li><i class="fas fa-star text-warning me-2"></i>NIST Generative AI Profile</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <i class="fas fa-rocket text-warning me-2"></i>
+                                Features
+                            </h5>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-star text-warning me-2"></i>562+ Assessment Items</li>
+                                <li><i class="fas fa-star text-warning me-2"></i>19 Compliance Frameworks</li>
+                                <li><i class="fas fa-star text-warning me-2"></i>9 NEW AI Frameworks</li>
+                                <li><i class="fas fa-star text-warning me-2"></i>Latest AI Legislation Coverage</li>
+                                <li><i class="fas fa-star text-warning me-2"></i>Evidence Upload Capability</li>
+                                <li><i class="fas fa-star text-warning me-2"></i>Progress Tracking</li>
+                                <li><i class="fas fa-star text-warning me-2"></i>Detailed Results</li>
+                                <li><i class="fas fa-star text-warning me-2"></i>Local Storage</li>
+                                <li><i class="fas fa-star text-warning me-2"></i>Mobile Responsive</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Assessment Data -->
+    <script src="data.js"></script>
+    
+    <!-- Main Application Script -->
+    <script>
+        // Global Variables
+        let currentFramework = null;
+        let currentAssessment = {};
+        let assessmentResponses = {};
+        let assessmentEvidence = {};
+        let currentUser = null;
+
+        // User Authentication System
+        const USERS = {
+            'admin': { 
+                password: 'admin123', 
+                name: 'System Administrator', 
+                email: 'admin@company.com',
+                role: 'Administrator'
+            },
+            'analyst': { 
+                password: 'analyst123', 
+                name: 'Compliance Analyst', 
+                email: 'analyst@company.com',
+                role: 'Analyst'
+            },
+            'auditor': { 
+                password: 'auditor123', 
+                name: 'Internal Auditor', 
+                email: 'auditor@company.com',
+                role: 'Auditor'
+            }
+        };
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hide loading spinner immediately
+            const spinner = document.getElementById('loadingSpinner');
+            if (spinner) {
+                spinner.style.display = 'none';
+            }
+            
+            // Check authentication immediately
+            checkAuthentication();
+        });
+
+        function checkAuthentication() {
+            console.log('🔐 Checking authentication...');
+            const savedUser = localStorage.getItem('currentUser');
+            console.log('📦 Saved user data:', savedUser);
+            
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    console.log('👤 Parsed user:', currentUser);
+                    
+                    if (USERS[currentUser.username]) {
+                        console.log('✅ User authenticated, showing main app');
+                        // User is authenticated, show main app
+                        showMainApplication();
+                    } else {
+                        console.log('❌ Invalid user data, showing login');
+                        // Invalid user data, show login
+                        showLoginModal();
+                    }
+                } catch (e) {
+                    console.log('💥 Error parsing user data:', e);
+                    // Corrupted data, show login
+                    showLoginModal();
+                }
+            } else {
+                console.log('🚪 No user data, showing login modal');
+                // No user data, show login
+                showLoginModal();
+            }
+        }
+
+        function showLoginModal() {
+            console.log('🎭 Attempting to show login modal...');
+            
+            const modalElement = document.getElementById('loginModal');
+            console.log('📱 Modal element found:', !!modalElement);
+            
+            if (!modalElement) {
+                console.error('❌ Login modal element not found!');
+                return;
+            }
+            
+            // Hide main content first
+            const container = document.querySelector('.container');
+            if (container) {
+                container.style.display = 'none';
+                console.log('📦 Main content hidden');
+            }
+            
+            // Hide force logout button
+            const forceLogoutBtn = document.querySelector('.force-logout-btn');
+            if (forceLogoutBtn) {
+                forceLogoutBtn.style.display = 'none';
+                console.log('🔄 Force logout button hidden');
+            }
+            
+            // Hide user dropdown
+            const userDropdown = document.getElementById('userDropdown');
+            if (userDropdown) {
+                userDropdown.classList.add('hidden');
+                console.log('👤 User dropdown hidden');
+            }
+            
+            // Show the modal
+            const modal = new bootstrap.Modal(document.getElementById('loginModal'));
+            modal.show();
+            console.log('✅ Login modal displayed');
+        }
+
+        function showMainApplication() {
+            console.log('🏠 Showing main application for user:', currentUser ? currentUser.username : 'NO USER');
+            
+            // CRITICAL: Only show main app if user is authenticated
+            if (!currentUser) {
+                console.error('🚫 NO USER FOUND - Showing login instead');
+                showLoginModal();
+                return;
+            }
+            
+            // Hide login modal if visible
+            const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
+            if (loginModal) {
+                loginModal.hide();
+                console.log('🔒 Login modal hidden');
+            }
+            
+            // Show main content
+            const container = document.querySelector('.container');
+            if (container) {
+                container.style.display = 'block';
+                console.log('📦 Main content shown');
+            }
+            
+            // Show force logout button
+            const forceLogoutBtn = document.querySelector('.force-logout-btn');
+            if (forceLogoutBtn) {
+                forceLogoutBtn.style.display = 'block';
+                console.log('🔄 Force logout button shown');
+            }
+            
+            // Update user interface
+            updateUserInterface();
+            
+            // Initialize the main application
+            initializeApp();
+            console.log('🚀 Main application initialized');
+        }
+
+        function updateUserInterface() {
+            if (currentUser) {
+                document.getElementById('currentUserName').textContent = currentUser.name;
+                document.getElementById('currentUserEmail').textContent = currentUser.email;
+                document.getElementById('userDropdown').classList.remove('hidden');
+            }
+        }
+
+        function loginDemo(username, password) {
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+            authenticateUser();
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.className = 'fas fa-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.className = 'fas fa-eye';
+            }
+        }
+
+        function authenticateUser() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                alert('Please enter both username and password.');
+                return;
+            }
+
+            const user = USERS[username];
+            if (user && user.password === password) {
+                // Successful login
+                currentUser = {
+                    username: username,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                    loginTime: new Date().toISOString()
+                };
+                
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showMainApplication();
+                
+                // Show welcome message
+                setTimeout(() => {
+                    alert(`Welcome ${user.name}!\n\nRole: ${user.role}\nYou now have your own private assessment environment.\n\nAll your assessments and data will be saved separately from other users.`);
+                }, 500);
+                
+            } else {
+                // Failed login
+                alert('Invalid username or password. Please try again.');
+                document.getElementById('password').value = '';
+                document.getElementById('username').focus();
+            }
+        }
+
+        function showLogoutModal() {
+            const modal = new bootstrap.Modal(document.getElementById('logoutModal'));
+            modal.show();
+        }
+
+        function confirmLogout() {
+            console.log('🚪 User logout confirmed');
+            
+            // Clear current user
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            
+            // Hide main content
+            document.querySelector('.container').style.display = 'none';
+            
+            // Hide user dropdown
+            const userDropdown = document.getElementById('userDropdown');
+            if (userDropdown) {
+                userDropdown.classList.add('hidden');
+                console.log('👤 User dropdown hidden');
+            }
+            
+            // Hide force logout button
+            const forceLogoutBtn = document.querySelector('.force-logout-btn');
+            if (forceLogoutBtn) {
+                forceLogoutBtn.style.display = 'none';
+                console.log('🔄 Force logout button hidden');
+            }
+            
+            // Show login modal
+            showLoginModal();
+            
+            // Hide logout modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('logoutModal'));
+            if (modal) {
+                modal.hide();
+            }
+        }
+
+        function getUserPrefix() {
+            return currentUser ? `user_${currentUser.username}_` : '';
+        }
+
+        function initializeApp() {
+            loadFrameworks();
+            loadSavedProgress();
+            updateDashboardStats();
+        }
+
+        // Login Form Event Listener
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            authenticateUser();
+        });
+
+        function loadFrameworks() {
+            const container = document.getElementById('frameworksContainer');
+            container.innerHTML = '';
+
+            window.assessmentData.frameworks.forEach(framework => {
+                const items = window.assessmentHelpers.getItemsByFramework(framework.code);
+                const progress = getSavedProgress(framework.code);
+                const progressPercent = progress ? Math.round((Object.keys(progress).length / items.length) * 100) : 0;
+
+                const card = document.createElement('div');
+                card.className = 'col-lg-4 col-md-6 mb-4';
+                card.innerHTML = `
+                    <div class="framework-card card h-100" onclick="startAssessment('${framework.code}')">
+                        <div class="card-body text-center">
+                            <i class="${framework.icon} framework-icon text-${framework.color_class}"></i>
+                            <h5 class="card-title">${framework.name}</h5>
+                            <p class="card-text text-muted">${framework.description}</p>
+                            <div class="mt-3">
+                                <span class="badge bg-${framework.color_class} me-2">${items.length} items</span>
+                                ${progressPercent > 0 ? `<span class="badge bg-warning">${progressPercent}% complete</span>` : ''}
+                            </div>
+                            ${progressPercent === 100 ? 
+                                `<div class="mt-3">
+                                    <button class="btn btn-success btn-custom me-2 mb-2" onclick="event.stopPropagation(); showFrameworkResults('${framework.code}')">
+                                        <i class="fas fa-chart-line me-2"></i>View Results
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-custom mb-2" onclick="event.stopPropagation(); startNewAssessment('${framework.code}')">
+                                        <i class="fas fa-redo me-2"></i>Start New Assessment
+                                    </button>
+                                </div>` : 
+                                `<button class="btn btn-primary btn-custom mt-3">
+                                    <i class="fas fa-play me-2"></i>${progressPercent > 0 ? 'Continue' : 'Start'} Assessment
+                                </button>`
+                            }
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function startAssessment(frameworkCode) {
+            currentFramework = frameworkCode;
+            const framework = window.assessmentData.frameworks.find(f => f.code === frameworkCode);
+            const items = window.assessmentHelpers.getItemsByFramework(frameworkCode);
+
+            document.getElementById('assessmentTitle').textContent = framework.name;
+            document.getElementById('assessmentDescription').textContent = framework.description;
+            document.getElementById('totalQuestions').textContent = items.length;
+
+            // Load saved responses and evidence
+            assessmentResponses = getSavedProgress(frameworkCode) || {};
+            assessmentEvidence = getSavedEvidence(frameworkCode) || {};
+
+            // Always hide completion actions initially
+            const completionActions = document.getElementById('assessmentCompletionActions');
+            if (completionActions) {
+                completionActions.classList.add('hidden');
+                completionActions.style.display = 'none';
+            }
+            document.getElementById('viewResultsBtn').style.display = 'none';
+
+            renderAssessmentQuestions(items);
+            updateProgress();
+            showView('assessmentView');
+            
+            // Double-check completion status after everything loads
+            setTimeout(() => {
+                checkAssessmentCompletion();
+            }, 500);
+        }
+
+        // Test function to manually show completion actions (for debugging)
+        function testCompletionActions() {
+            const completionActions = document.getElementById('assessmentCompletionActions');
+            if (completionActions) {
+                completionActions.classList.remove('hidden');
+                completionActions.style.display = 'block';
+                completionActions.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                console.log('Completion actions manually triggered');
+            } else {
+                console.log('Completion actions element not found');
+            }
+        }
+
+        function renderAssessmentQuestions(items) {
+            const container = document.getElementById('assessmentContent');
+            container.innerHTML = '';
+
+            let currentSection = '';
+
+            items.forEach((item, index) => {
+                if (item.section !== currentSection) {
+                    currentSection = item.section;
+                    const sectionHeader = document.createElement('div');
+                    sectionHeader.className = 'section-header';
+                    sectionHeader.innerHTML = `
+                        <h4 class="mb-0">
+                            <i class="fas fa-folder me-2"></i>
+                            ${item.section}
+                        </h4>
+                    `;
+                    container.appendChild(sectionHeader);
+                }
+
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'assessment-item';
+                questionDiv.innerHTML = `
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <h6 class="fw-bold text-primary mb-2">Question ${index + 1}</h6>
+                            <p class="mb-3">${item.item_text}</p>
+                            ${item.help_text ? `<small class="text-muted"><i class="fas fa-info-circle me-1"></i>${item.help_text}</small>` : ''}
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="mt-3">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="q${item.id}" value="yes" 
+                                           ${assessmentResponses[item.id] === 'yes' ? 'checked' : ''}
+                                           onchange="updateResponse(${item.id}, 'yes')">
+                                    <label class="form-check-label text-success">
+                                        <i class="fas fa-check me-1"></i>Yes / Compliant
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="q${item.id}" value="partial"
+                                           ${assessmentResponses[item.id] === 'partial' ? 'checked' : ''}
+                                           onchange="updateResponse(${item.id}, 'partial')">
+                                    <label class="form-check-label text-warning">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>Partially
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio" name="q${item.id}" value="no"
+                                           ${assessmentResponses[item.id] === 'no' ? 'checked' : ''}
+                                           onchange="updateResponse(${item.id}, 'no')">
+                                    <label class="form-check-label text-danger">
+                                        <i class="fas fa-times me-1"></i>No / Non-Compliant
+                                    </label>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="radio" name="q${item.id}" value="not-applicable"
+                                           ${assessmentResponses[item.id] === 'not-applicable' ? 'checked' : ''}
+                                           onchange="updateResponse(${item.id}, 'not-applicable')">
+                                    <label class="form-check-label text-muted">
+                                        <i class="fas fa-minus me-1"></i>Not Applicable
+                                    </label>
+                                </div>
+                                
+                                <!-- Evidence Upload Section -->
+                                <div class="border-top pt-3">
+                                    <h6 class="text-primary mb-2">
+                                        <i class="fas fa-paperclip me-1"></i>Upload Evidence
+                                    </h6>
+                                    <input type="file" class="form-control form-control-sm mb-2" 
+                                           id="evidence_${item.id}" 
+                                           onchange="handleEvidenceUpload(${item.id}, this)"
+                                           accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,.xlsx,.xls">
+                                    <div id="evidenceList_${item.id}" class="mt-2">
+                                        <!-- Uploaded evidence will appear here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(questionDiv);
+                
+                // Load existing evidence for this question
+                loadEvidenceForQuestion(item.id);
+            });
+        }
+
+        function updateResponse(itemId, response) {
+            assessmentResponses[itemId] = response;
+            saveProgress(currentFramework, assessmentResponses);
+            updateProgress();
+            
+            // Additional check for completion
+            setTimeout(() => {
+                checkAssessmentCompletion();
+            }, 100);
+        }
+
+        // Additional function to ensure completion actions are shown
+        function checkAssessmentCompletion() {
+            if (!currentFramework) return;
+            
+            const items = window.assessmentHelpers.getItemsByFramework(currentFramework);
+            const answered = Object.keys(assessmentResponses).length;
+            
+            if (answered === items.length && items.length > 0) {
+                const completionActions = document.getElementById('assessmentCompletionActions');
+                if (completionActions) {
+                    completionActions.classList.remove('hidden');
+                    completionActions.style.display = 'block';
+                    
+                    // Ensure it's visible
+                    setTimeout(() => {
+                        if (completionActions.classList.contains('hidden')) {
+                            completionActions.classList.remove('hidden');
+                        }
+                        completionActions.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 200);
+                }
+            }
+        }
+
+        function updateProgress() {
+            const items = window.assessmentHelpers.getItemsByFramework(currentFramework);
+            const answered = Object.keys(assessmentResponses).length;
+            const percent = Math.round((answered / items.length) * 100);
+
+            document.getElementById('progressCircle').textContent = percent + '%';
+            document.getElementById('currentQuestion').textContent = answered;
+
+            console.log('Progress Update:', answered, 'of', items.length, 'questions answered');
+
+            // Show completion actions when assessment is complete
+            const completionActions = document.getElementById('assessmentCompletionActions');
+            const viewResultsBtn = document.getElementById('viewResultsBtn');
+            
+            if (answered === items.length && items.length > 0) {
+                console.log('Assessment complete! Showing completion actions...');
+                if (viewResultsBtn) viewResultsBtn.style.display = 'block';
+                if (completionActions) {
+                    completionActions.classList.remove('hidden');
+                    completionActions.style.display = 'block';
+                    // Scroll to completion actions
+                    setTimeout(() => {
+                        completionActions.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                }
+            } else {
+                if (completionActions) {
+                    completionActions.classList.add('hidden');
+                    completionActions.style.display = 'none';
+                }
+                if (viewResultsBtn) viewResultsBtn.style.display = 'none';
+            }
+        }
+
+        function showResults() {
+            if (currentFramework) {
+                showFrameworkResults(currentFramework);
+            }
+        }
+
+        function showFrameworkResults(frameworkCode) {
+            const framework = window.assessmentData.frameworks.find(f => f.code === frameworkCode);
+            
+            // Get responses from current session OR localStorage
+            let responses = assessmentResponses;
+            if (!responses || Object.keys(responses).length === 0) {
+                responses = getSavedProgress(frameworkCode);
+            }
+            
+            if (!responses || Object.keys(responses).length === 0) {
+                alert('Please complete some assessment questions first.');
+                return;
+            }
+
+            console.log('Showing results for:', framework.name, 'with', Object.keys(responses).length, 'responses');
+
+            const score = window.assessmentHelpers.calculateScore(responses);
+            const status = window.assessmentHelpers.getComplianceStatus(score, frameworkCode);
+            const items = window.assessmentHelpers.getItemsByFramework(frameworkCode);
+
+            // Analyze responses
+            let yesCount = 0, partialCount = 0, noCount = 0, naCount = 0;
+            let gaps = [];
+
+            items.forEach(item => {
+                const response = responses[item.id];
+                if (response === 'yes') yesCount++;
+                else if (response === 'partial') partialCount++;
+                else if (response === 'no') {
+                    noCount++;
+                    gaps.push(item.item_text);
+                }
+                else if (response === 'not-applicable') naCount++;
+            });
+
+            const totalAnswered = Object.keys(responses).length;
+            const completionPercent = Math.round((totalAnswered / items.length) * 100);
+
+            document.getElementById('resultsContent').innerHTML = `
+                <div class="text-center mb-4">
+                    <h3 class="text-primary mb-3">
+                        <i class="${framework.icon} me-2"></i>
+                        ${framework.name}
+                    </h3>
+                    <div class="compliance-status status-${status.class}">
+                        ${status.text} - ${score}% Compliant
+                    </div>
+                    <p class="text-muted mt-2">Assessment completed: ${completionPercent}% (${totalAnswered} of ${items.length} questions)</p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <button class="btn btn-primary btn-custom w-100" onclick="saveAssessment()">
+                            <i class="fas fa-save me-2"></i>Save Assessment
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-info btn-custom w-100" onclick="exportToCSV()">
+                            <i class="fas fa-download me-2"></i>Export to CSV
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-outline-secondary btn-custom w-100" onclick="startNewAssessment('${frameworkCode}')">
+                            <i class="fas fa-redo me-2"></i>Start New Assessment
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-3 col-6 text-center mb-3">
+                        <div class="h2 text-primary fw-bold">${score}%</div>
+                        <div class="text-muted">Overall Score</div>
+                    </div>
+                    <div class="col-md-3 col-6 text-center mb-3">
+                        <div class="h2 text-success fw-bold">${yesCount}</div>
+                        <div class="text-muted">Compliant</div>
+                    </div>
+                    <div class="col-md-3 col-6 text-center mb-3">
+                        <div class="h2 text-warning fw-bold">${partialCount}</div>
+                        <div class="text-muted">Partial</div>
+                    </div>
+                    <div class="col-md-3 col-6 text-center mb-3">
+                        <div class="h2 text-danger fw-bold">${noCount}</div>
+                        <div class="text-muted">Non-Compliant</div>
+                    </div>
+                </div>
+
+                ${gaps.length > 0 ? `
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                            Compliance Gaps (${gaps.length} items)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">The following areas require attention to achieve full compliance:</p>
+                        <ul class="list-group list-group-flush">
+                            ${gaps.slice(0, 10).map(gap => `<li class="list-group-item"><i class="fas fa-exclamation-circle text-danger me-2"></i>${gap}</li>`).join('')}
+                            ${gaps.length > 10 ? `<li class="list-group-item text-muted"><i class="fas fa-ellipsis-h me-2"></i>... and ${gaps.length - 10} more items</li>` : ''}
+                        </ul>
+                    </div>
+                </div>
+                ` : ''}
+            `;
+
+            showView('resultsView');
+        }
+
+        // Utility Functions
+        function showView(viewId) {
+            document.querySelectorAll('[id$="View"]').forEach(view => {
+                view.classList.add('hidden');
+            });
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        function showDashboard() {
+            showView('dashboardView');
+            loadFrameworks(); // Refresh to show updated progress
+            updateDashboardStats();
+        }
+
+        function showAbout() {
+            showView('aboutView');
+        }
+
+        function saveProgress(frameworkCode, responses) {
+            if (!currentUser) return; // Don't save if not logged in
+            const userPrefix = getUserPrefix();
+            localStorage.setItem(`${userPrefix}assessment_${frameworkCode}`, JSON.stringify(responses));
+        }
+
+        function getSavedProgress(frameworkCode) {
+            if (!currentUser) return null; // Don't load if not logged in
+            const userPrefix = getUserPrefix();
+            const saved = localStorage.getItem(`${userPrefix}assessment_${frameworkCode}`);
+            return saved ? JSON.parse(saved) : null;
+        }
+
+        function loadSavedProgress() {
+            // This function loads all saved progress for dashboard display
+        }
+
+        function updateDashboardStats() {
+            let completed = 0;
+            let inProgress = 0;
+
+            window.assessmentData.frameworks.forEach(framework => {
+                const progress = getSavedProgress(framework.code);
+                const items = window.assessmentHelpers.getItemsByFramework(framework.code);
+                
+                if (progress) {
+                    const answered = Object.keys(progress).length;
+                    if (answered === items.length) {
+                        completed++;
+                    } else if (answered > 0) {
+                        inProgress++;
+                    }
+                }
+            });
+
+            document.getElementById('completedAssessments').textContent = completed;
+            document.getElementById('savedProgress').textContent = inProgress;
+        }
+
+        // Evidence Upload Functions
+        function handleEvidenceUpload(itemId, fileInput) {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            // Check file size (limit to 5MB for browser storage)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size too large. Please select a file smaller than 5MB.');
+                fileInput.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Store evidence in memory
+                if (!assessmentEvidence[itemId]) {
+                    assessmentEvidence[itemId] = [];
+                }
+
+                const evidenceItem = {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    data: e.target.result,
+                    uploadDate: new Date().toISOString()
+                };
+
+                assessmentEvidence[itemId].push(evidenceItem);
+                saveEvidence(currentFramework, assessmentEvidence);
+                displayEvidenceForQuestion(itemId);
+                
+                // Clear the file input
+                fileInput.value = '';
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        function displayEvidenceForQuestion(itemId) {
+            const evidenceContainer = document.getElementById(`evidenceList_${itemId}`);
+            if (!evidenceContainer) return;
+
+            const evidence = assessmentEvidence[itemId] || [];
+            
+            if (evidence.length === 0) {
+                evidenceContainer.innerHTML = '<small class="text-muted">No evidence uploaded</small>';
+                return;
+            }
+
+            evidenceContainer.innerHTML = evidence.map((item, index) => `
+                <div class="d-flex align-items-center justify-content-between bg-light p-2 rounded mb-1">
+                    <div class="flex-grow-1">
+                        <small class="text-primary fw-bold">${item.name}</small>
+                        <br>
+                        <small class="text-muted">${formatFileSize(item.size)} • ${new Date(item.uploadDate).toLocaleDateString()}</small>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="downloadEvidence(${itemId}, ${index})" title="Download">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeEvidence(${itemId}, ${index})" title="Remove">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadEvidenceForQuestion(itemId) {
+            displayEvidenceForQuestion(itemId);
+        }
+
+        function downloadEvidence(itemId, evidenceIndex) {
+            const evidence = assessmentEvidence[itemId][evidenceIndex];
+            if (!evidence) return;
+
+            const link = document.createElement('a');
+            link.href = evidence.data;
+            link.download = evidence.name;
+            link.click();
+        }
+
+        function removeEvidence(itemId, evidenceIndex) {
+            if (confirm('Are you sure you want to remove this evidence file?')) {
+                assessmentEvidence[itemId].splice(evidenceIndex, 1);
+                if (assessmentEvidence[itemId].length === 0) {
+                    delete assessmentEvidence[itemId];
+                }
+                saveEvidence(currentFramework, assessmentEvidence);
+                displayEvidenceForQuestion(itemId);
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Start New Assessment Function
+        function startNewAssessment(frameworkCode) {
+            const framework = window.assessmentData.frameworks.find(f => f.code === frameworkCode);
+            
+            const confirmMessage = `Are you sure you want to start a new assessment for ${framework.name}?\n\nThis will:\n• Clear all current responses\n• Remove all uploaded evidence\n• Reset progress to 0%\n\nThis action cannot be undone.`;
+            
+            if (confirm(confirmMessage)) {
+                // Clear saved data (user-specific)
+                const userPrefix = getUserPrefix();
+                localStorage.removeItem(`${userPrefix}assessment_${frameworkCode}`);
+                localStorage.removeItem(`${userPrefix}evidence_${frameworkCode}`);
+                
+                // Reset global variables
+                assessmentResponses = {};
+                assessmentEvidence = {};
+                
+                // Refresh dashboard to show updated progress
+                showDashboard();
+                
+                // Show success message
+                setTimeout(() => {
+                    alert(`New assessment started for ${framework.name}!\n\nYou can now begin the assessment with a clean slate.`);
+                }, 100);
+            }
+        }
+
+        // Evidence Storage Functions
+        function saveEvidence(frameworkCode, evidence) {
+            if (!currentUser) return; // Don't save if not logged in
+            try {
+                const userPrefix = getUserPrefix();
+                localStorage.setItem(`${userPrefix}evidence_${frameworkCode}`, JSON.stringify(evidence));
+            } catch (e) {
+                console.warn('Evidence storage full. Some files may not be saved.', e);
+                alert('Browser storage is full. Please clear some data or use smaller files.');
+            }
+        }
+
+        function getSavedEvidence(frameworkCode) {
+            if (!currentUser) return null; // Don't load if not logged in
+            const userPrefix = getUserPrefix();
+            const saved = localStorage.getItem(`${userPrefix}evidence_${frameworkCode}`);
+            return saved ? JSON.parse(saved) : null;
+        }
+
+        // === NEW FUNCTIONALITY ===
+        
+        // Save Assessment Function - Enhanced with User Context
+        function saveAssessment() {
+            if (!currentFramework) {
+                alert('No active assessment to save.');
+                return;
+            }
+
+            const framework = window.assessmentData.frameworks.find(f => f.code === currentFramework);
+            
+            // Get responses from current session OR localStorage
+            let responses = assessmentResponses;
+            if (!responses || Object.keys(responses).length === 0) {
+                responses = getSavedProgress(currentFramework);
+            }
+            
+            // Get evidence from current session OR localStorage
+            let evidence = assessmentEvidence;
+            if (!evidence || Object.keys(evidence).length === 0) {
+                evidence = getSavedEvidence(currentFramework);
+            }
+            
+            if (!responses || Object.keys(responses).length === 0) {
+                alert('No assessment data to save. Please complete some questions first.');
+                return;
+            }
+
+            console.log('Saving assessment for:', framework.name, 'with', Object.keys(responses).length, 'responses');
+
+            // Create a comprehensive save object with user context
+            const saveData = {
+                framework: framework.name,
+                frameworkCode: currentFramework,
+                completedDate: new Date().toISOString(),
+                responses: responses,
+                evidence: evidence || {},
+                summary: calculateAssessmentSummary(currentFramework),
+                totalQuestions: window.assessmentHelpers.getItemsByFramework(currentFramework).length,
+                answeredQuestions: Object.keys(responses).length,
+                user: currentUser ? {
+                    username: currentUser.username,
+                    name: currentUser.name,
+                    role: currentUser.role
+                } : null
+            };
+
+            // Save to localStorage with user-specific key
+            const userPrefix = getUserPrefix();
+            const saveKey = `${userPrefix}saved_assessment_${currentFramework}_${Date.now()}`;
+            localStorage.setItem(saveKey, JSON.stringify(saveData));
+            
+            // Also update the current progress to ensure consistency
+            saveProgress(currentFramework, responses);
+            if (evidence) {
+                saveEvidence(currentFramework, evidence);
+            }
+            
+            const completionPercent = Math.round((Object.keys(responses).length / saveData.totalQuestions) * 100);
+            
+            alert(`✅ Assessment Saved Successfully!\n\nUser: ${currentUser.name}\nFramework: ${framework.name}\nQuestions Answered: ${Object.keys(responses).length} of ${saveData.totalQuestions}\nCompletion: ${completionPercent}%\nSaved: ${new Date().toLocaleString()}\n\nYou can now export to CSV or view results.`);
+        }
+
+        // Export to CSV Function - Enhanced to work after saving
+        function exportToCSV() {
+            if (!currentFramework) {
+                alert('No active assessment to export.');
+                return;
+            }
+
+            const framework = window.assessmentData.frameworks.find(f => f.code === currentFramework);
+            const items = window.assessmentHelpers.getItemsByFramework(currentFramework);
+            
+            // Get responses from current session OR from localStorage
+            let responses = assessmentResponses;
+            if (!responses || Object.keys(responses).length === 0) {
+                responses = getSavedProgress(currentFramework);
+            }
+            
+            // Get evidence from current session OR from localStorage  
+            let evidence = assessmentEvidence;
+            if (!evidence || Object.keys(evidence).length === 0) {
+                evidence = getSavedEvidence(currentFramework);
+            }
+            
+            if (!responses || Object.keys(responses).length === 0) {
+                alert('No assessment data to export. Please complete some questions first.');
+                return;
+            }
+
+            console.log('Exporting CSV for:', framework.name, 'with', Object.keys(responses).length, 'responses');
+
+            // Create CSV content with BOM for proper Excel encoding
+            let csvContent = "\uFEFF"; // BOM for UTF-8
+            csvContent += "Framework,Question ID,Section,Question Text,Help Text,User Response,Evidence Files,Evidence Count,Date Answered\n";
+            
+            items.forEach((item, index) => {
+                const response = responses[item.id] || 'Not Answered';
+                const itemEvidence = evidence && evidence[item.id] ? evidence[item.id] : [];
+                const evidenceFiles = itemEvidence.map(e => e.name).join('; ');
+                const evidenceCount = itemEvidence.length;
+                const dateAnswered = response !== 'Not Answered' ? new Date().toLocaleDateString() : '';
+                
+                // Escape commas and quotes in text for CSV format
+                const frameworkName = `"${framework.name.replace(/"/g, '""')}"`;
+                const sectionName = `"${(item.section || 'General').replace(/"/g, '""')}"`;
+                const questionText = `"${item.item_text.replace(/"/g, '""')}"`;
+                const helpText = `"${(item.help_text || '').replace(/"/g, '""')}"`;
+                const evidenceText = `"${evidenceFiles.replace(/"/g, '""')}"`;
+                
+                csvContent += `${frameworkName},${item.id},${sectionName},${questionText},${helpText},${response},${evidenceText},${evidenceCount},${dateAnswered}\n`;
+            });
+
+            // Add comprehensive summary information
+            const summary = calculateAssessmentSummary(currentFramework);
+            if (summary) {
+                csvContent += "\n\nASSESSMENT SUMMARY\n";
+                csvContent += `Framework,"${framework.name}"\n`;
+                csvContent += `Total Questions,${items.length}\n`;
+                csvContent += `Answered Questions,${Object.keys(responses).length}\n`;
+                csvContent += `Completion Percentage,${Math.round((Object.keys(responses).length / items.length) * 100)}%\n`;
+                csvContent += `Compliant (Yes),${summary.compliant}\n`;
+                csvContent += `Partially Compliant,${summary.partial}\n`;
+                csvContent += `Non-Compliant (No),${summary.nonCompliant}\n`;
+                csvContent += `Not Applicable,${summary.notApplicable}\n`;
+                csvContent += `Overall Compliance Score,${summary.overallCompliance}%\n`;
+                csvContent += `Assessment Export Date,${new Date().toLocaleString()}\n`;
+                csvContent += `Assessment Export Time,${new Date().toISOString()}\n`;
+            }
+
+            // Create and download CSV file
+            try {
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                
+                // Create descriptive filename
+                const safeFrameworkName = framework.name.replace(/[^a-zA-Z0-9]/g, '_');
+                const dateStr = new Date().toISOString().split('T')[0];
+                const timeStr = new Date().toTimeString().split(' ')[0].replace(/:/g, '-');
+                link.download = `${safeFrameworkName}_Assessment_${dateStr}_${timeStr}.csv`;
+                
+                // Trigger download
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+                
+                alert(`✅ Assessment results exported successfully!\n\nFile: ${link.download}\n\nTotal Questions: ${items.length}\nAnswered: ${Object.keys(responses).length}\nCompliance Score: ${summary ? summary.overallCompliance : 'N/A'}%`);
+                
+            } catch (error) {
+                console.error('Export error:', error);
+                alert('Error exporting CSV. Please try again.');
+            }
+        }
+
+        // Calculate Assessment Summary - Enhanced
+        function calculateAssessmentSummary(frameworkCode) {
+            // Get responses from current session OR localStorage
+            let responses = assessmentResponses;
+            if (!responses || Object.keys(responses).length === 0) {
+                responses = getSavedProgress(frameworkCode);
+            }
+            
+            if (!responses || Object.keys(responses).length === 0) {
+                return {
+                    compliant: 0,
+                    partial: 0,
+                    nonCompliant: 0,
+                    notApplicable: 0,
+                    total: 0,
+                    overallCompliance: 0
+                };
+            }
+
+            const summary = {
+                compliant: 0,
+                partial: 0,
+                nonCompliant: 0,
+                notApplicable: 0,
+                total: Object.keys(responses).length
+            };
+
+            Object.values(responses).forEach(response => {
+                switch(response) {
+                    case 'yes': summary.compliant++; break;
+                    case 'partial': summary.partial++; break;
+                    case 'no': summary.nonCompliant++; break;
+                    case 'not-applicable': summary.notApplicable++; break;
+                }
+            });
+
+            // Calculate compliance percentage (excluding not applicable)
+            const applicableTotal = summary.total - summary.notApplicable;
+            summary.overallCompliance = applicableTotal > 0 ? 
+                Math.round(((summary.compliant + (summary.partial * 0.5)) / applicableTotal) * 100) : 0;
+
+            return summary;
+        }
+
+        // Data Catalogue Upload Handler
+        function handleDataCatalogueUpload(fileInput) {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    let data;
+                    const fileName = file.name.toLowerCase();
+                    
+                    if (fileName.endsWith('.json')) {
+                        data = JSON.parse(e.target.result);
+                    } else if (fileName.endsWith('.csv')) {
+                        data = parseCSV(e.target.result);
+                    } else {
+                        alert('Please upload a CSV or JSON file. Excel files require manual conversion.');
+                        return;
+                    }
+
+                    analyzeDataCatalogue(data);
+                } catch (error) {
+                    alert('Error parsing file: ' + error.message);
+                }
+            };
+
+            if (file.name.toLowerCase().endsWith('.json')) {
+                reader.readAsText(file);
+            } else {
+                reader.readAsText(file);
+            }
+        }
+
+        // Enhanced CSV Parser with support for quoted fields and complex CSV structures
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            
+            // Enhanced header parsing with better quote handling
+            const headers = parseCSVLine(lines[0]);
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseCSVLine(lines[i]);
+                if (values.length === 1 && values[0] === '') continue; // Skip empty lines
+                
+                const row = {};
+                headers.forEach((header, index) => {
+                    row[header] = values[index] || '';
+                });
+                data.push(row);
+            }
+
+            return data;
+        }
+
+        // Parse a single CSV line handling quoted fields and commas
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            let i = 0;
+
+            while (i < line.length) {
+                const char = line[i];
+                const nextChar = line[i + 1];
+
+                if (char === '"') {
+                    if (inQuotes && nextChar === '"') {
+                        // Escaped quote
+                        current += '"';
+                        i += 2;
+                    } else {
+                        // Toggle quote state
+                        inQuotes = !inQuotes;
+                        i++;
+                    }
+                } else if (char === ',' && !inQuotes) {
+                    // Field separator
+                    result.push(current.trim());
+                    current = '';
+                    i++;
+                } else {
+                    current += char;
+                    i++;
+                }
+            }
+
+            // Add the last field
+            result.push(current.trim());
+            
+            // Remove quotes from fields
+            return result.map(field => field.replace(/^"(.*)"$/, '$1'));
+        }
+
+        // Analyze Data Catalogue and Recommend Frameworks
+        function analyzeDataCatalogue(data) {
+            const results = document.getElementById('dataCatalogueResults');
+            results.classList.remove('hidden');
+
+            // Framework recommendation logic based on data characteristics
+            const recommendations = [];
+            const dataCharacteristics = analyzeDataCharacteristics(data);
+
+            // Check each framework's applicability
+            window.assessmentData.frameworks.forEach(framework => {
+                const relevanceScore = calculateFrameworkRelevance(framework, dataCharacteristics);
+                if (relevanceScore > 0) {
+                    recommendations.push({
+                        framework: framework,
+                        score: relevanceScore,
+                        reasons: getRecommendationReasons(framework, dataCharacteristics)
+                    });
+                }
+            });
+
+            // Sort by relevance score
+            recommendations.sort((a, b) => b.score - a.score);
+
+            // Display results
+            displayDataCatalogueResults(dataCharacteristics, recommendations);
+        }
+
+        // Enhanced Data Characteristics Analysis with comprehensive pattern detection
+        function analyzeDataCharacteristics(data) {
+            const characteristics = {
+                hasPersonalData: false,
+                hasHealthData: false,
+                hasFinancialData: false,
+                hasCriticalInfrastructure: false,
+                hasAIData: false,
+                hasBiometricData: false,
+                hasLocationData: false,
+                hasBehavioralData: false,
+                regions: new Set(),
+                classifications: new Set(),
+                dataTypes: new Set(),
+                columnAnalysis: {},
+                recordCount: Array.isArray(data) ? data.length : 0
+            };
+
+            if (!Array.isArray(data)) data = [data];
+            
+            // Get all column headers for analysis
+            const headers = Object.keys(data[0] || {});
+            
+            // Analyze each column for data types and patterns
+            headers.forEach(header => {
+                characteristics.columnAnalysis[header] = analyzeColumn(data, header);
+            });
+
+            data.forEach(record => {
+                // Comprehensive data type analysis using enhanced patterns
+                analyzeRecordForDataTypes(record, characteristics);
+                extractRegionsAndClassifications(record, characteristics);
+            });
+
+            // Calculate final data type flags based on column analysis and patterns
+            finalizeDataTypeDetection(characteristics);
+
+            return characteristics;
+        }
+
+        // Analyze individual column for data types
+        function analyzeColumn(data, header) {
+            const headerLower = header.toLowerCase();
+            const columnData = data.map(row => row[header] || '').filter(val => val !== '');
+            
+            return {
+                headerName: header,
+                dataType: detectColumnDataType(columnData, headerLower),
+                patterns: detectColumnPatterns(columnData, headerLower),
+                sensitivityLevel: assessColumnSensitivity(headerLower, columnData),
+                hasIdentifiers: detectIdentifiers(columnData, headerLower),
+                hasEncryptedFields: columnData.some(val => typeof val === 'string' && val.match(/^[A-Za-z0-9+/]{20,}={0,2}$/))
+            };
+        }
+
+        // Detect column data type based on content and header name
+        function detectColumnDataType(data, headerLower) {
+            const header = headerLower;
+            const sampleValues = data.slice(0, 10);
+            
+            // Email detection
+            if (header.includes('email') || sampleValues.some(val => val.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/))) {
+                return 'email';
+            }
+            
+            // Phone detection
+            if (header.includes('phone') || header.includes('mobile') || sampleValues.some(val => val.match(/^[\+]?[1-9][\d]{0,15}$/))) {
+                return 'phone';
+            }
+            
+            // Credit card detection
+            if (header.includes('credit') || header.includes('card') || sampleValues.some(val => val.match(/^[\d\s\-\*]{13,19}$/))) {
+                return 'credit_card';
+            }
+            
+            // SSN detection
+            if (header.includes('ssn') || header.includes('social') || sampleValues.some(val => val.match(/^\d{3}-\d{2}-\d{4}$/))) {
+                return 'ssn';
+            }
+            
+            // Date detection
+            if (header.includes('date') || header.includes('dob') || sampleValues.some(val => val.match(/^\d{4}-\d{2}-\d{2}/) || val.match(/^\d{1,2}\/\d{1,2}\/\d{4}/))) {
+                return 'date';
+            }
+            
+            // Address detection
+            if (header.includes('address') || header.includes('street') || sampleValues.some(val => val.match(/\d+.*[street|ave|road|blvd|dr|ln]/i))) {
+                return 'address';
+            }
+            
+            // Name detection
+            if (header.includes('name') || header.includes('firstname') || header.includes('lastname')) {
+                return 'name';
+            }
+            
+            return 'text';
+        }
+
+        // Detect specific patterns in column data
+        function detectColumnPatterns(data, headerLower) {
+            const patterns = new Set();
+            
+            data.slice(0, 20).forEach(value => {
+                if (typeof value !== 'string') return;
+                
+                const valueLower = value.toLowerCase();
+                
+                // Personal identifiers
+                if (value.match(/^\d{9}$/) || value.match(/^\d{3}-\d{2}-\d{4}$/)) patterns.add('ssn_pattern');
+                if (value.match(/^[A-Z]\d{7}$/)) patterns.add('passport_pattern');
+                
+                // Health-related
+                if (valueLower.includes('patient') || valueLower.includes('medical') || valueLower.includes('diagnosis')) patterns.add('health_related');
+                if (value.match(/^[A-Z]{2}\d{6}$/)) patterns.add('medical_record_number');
+                
+                // Financial
+                if (value.match(/^\$?[\d,]+\.?\d{0,2}$/)) patterns.add('monetary_amount');
+                if (value.match(/^\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{1,4}$/)) patterns.add('credit_card_number');
+                
+                // Geographic
+                if (value.match(/^\d{5}(-\d{4})?$/)) patterns.add('postal_code');
+                if (value.match(/^[-+]?[1-8]?\d(\.\d+)?,\s*[-+]?(1[0-7]\d|[1-9]?\d)(\.\d+)?$/)) patterns.add('coordinates');
+                
+                // Behavioral/Biometric
+                if (value.match(/^[A-Za-z0-9+/]{20,}={0,2}$/)) patterns.add('encoded_data');
+                if (valueLower.includes('biometric') || valueLower.includes('fingerprint')) patterns.add('biometric');
+            });
+            
+            return Array.from(patterns);
+        }
+
+        // Assess sensitivity level of column
+        function assessColumnSensitivity(headerLower, data) {
+            const sensitiveHeaders = [
+                'password', 'ssn', 'credit_card', 'bank_account', 'medical_record', 
+                'social_security', 'passport', 'driver_license', 'biometric'
+            ];
+            
+            const moderateHeaders = [
+                'email', 'phone', 'address', 'date_of_birth', 'name', 'salary', 'salary_range'
+            ];
+            
+            if (sensitiveHeaders.some(h => headerLower.includes(h))) return 'high';
+            if (moderateHeaders.some(h => headerLower.includes(h))) return 'moderate';
+            return 'low';
+        }
+
+        // Detect personal identifiers in data
+        function detectIdentifiers(data, headerLower) {
+            const identifiers = [];
+            
+            data.slice(0, 10).forEach(value => {
+                if (typeof value !== 'string') return;
+                
+                if (value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) identifiers.push('email');
+                if (value.match(/^\d{3}-\d{2}-\d{4}$/)) identifiers.push('ssn');
+                if (value.match(/^\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{1,4}$/)) identifiers.push('credit_card');
+            });
+            
+            return Array.from(new Set(identifiers));
+        }
+
+        // Enhanced record analysis for data types
+        function analyzeRecordForDataTypes(record, characteristics) {
+            const recordText = JSON.stringify(record).toLowerCase();
+            
+            // Enhanced personal data detection
+            const personalIndicators = [
+                'personal data', 'pii', 'personally identifiable', 'customer data', 'user data',
+                'client data', 'employee data', 'member data', 'contact information', 'profile data'
+            ];
+            
+            if (personalIndicators.some(indicator => recordText.includes(indicator)) ||
+                containsEmail(record) || containsPhone(record) || containsName(record)) {
+                characteristics.hasPersonalData = true;
+            }
+
+            // Enhanced health data detection
+            const healthIndicators = [
+                'health data', 'medical data', 'patient data', 'clinical data', 'diagnostic data',
+                'treatment data', 'healthcare data', 'hospital data', 'medical record', 'clinical trial'
+            ];
+            
+            if (healthIndicators.some(indicator => recordText.includes(indicator)) ||
+                containsPatientID(record) || containsMedicalRecord(record)) {
+                characteristics.hasHealthData = true;
+            }
+
+            // Enhanced financial data detection
+            const financialIndicators = [
+                'financial data', 'payment data', 'transaction data', 'banking data', 'credit data',
+                'account data', 'billing data', 'financial record', 'payment information'
+            ];
+            
+            if (financialIndicators.some(indicator => recordText.includes(indicator)) ||
+                containsAccountNumber(record) || containsCreditCard(record)) {
+                characteristics.hasFinancialData = true;
+            }
+
+            // AI/ML data detection
+            const aiIndicators = [
+                'ai data', 'machine learning data', 'model data', 'training data', 'algorithm data',
+                'neural network', 'deep learning', 'computer vision', 'nlp data', 'predictive model'
+            ];
+            
+            if (aiIndicators.some(indicator => recordText.includes(indicator))) {
+                characteristics.hasAIData = true;
+            }
+
+            // Biometric data detection
+            const biometricIndicators = [
+                'biometric data', 'fingerprint data', 'facial recognition', 'voice data', 'iris data',
+                'biometric identifier', 'biometric template'
+            ];
+            
+            if (biometricIndicators.some(indicator => recordText.includes(indicator))) {
+                characteristics.hasBiometricData = true;
+            }
+
+            // Location data detection
+            if (recordText.includes('location data') || recordText.includes('gps data') || recordText.includes('geolocation')) {
+                characteristics.hasLocationData = true;
+            }
+
+            // Behavioral data detection
+            const behavioralIndicators = [
+                'behavioral data', 'usage data', 'interaction data', 'user behavior', 'browsing history',
+                'search history', 'click data', 'preference data'
+            ];
+            
+            if (behavioralIndicators.some(indicator => recordText.includes(indicator))) {
+                characteristics.hasBehavioralData = true;
+            }
+
+            // Critical infrastructure detection
+            if (recordText.includes('critical infrastructure') || recordText.includes('essential service')) {
+                characteristics.hasCriticalInfrastructure = true;
+            }
+        }
+
+        // Helper functions for specific data type detection
+        function containsEmail(record) {
+            return Object.values(record).some(val => typeof val === 'string' && val.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/));
+        }
+
+        function containsPhone(record) {
+            return Object.values(record).some(val => typeof val === 'string' && val.match(/^[\+]?[1-9][\d]{0,15}$/));
+        }
+
+        function containsName(record) {
+            const nameFields = ['name', 'firstname', 'lastname', 'fullname', 'username'];
+            return Object.keys(record).some(key => nameFields.includes(key.toLowerCase())) ||
+                   Object.values(record).some(val => typeof val === 'string' && val.match(/^[A-Za-z]+(?:\s+[A-Za-z]+)*$/));
+        }
+
+        function containsPatientID(record) {
+            return Object.keys(record).some(key => key.toLowerCase().includes('patient')) ||
+                   Object.values(record).some(val => typeof val === 'string' && val.match(/^[A-Z]{2}\d{6}$/));
+        }
+
+        function containsMedicalRecord(record) {
+            return Object.keys(record).some(key => key.toLowerCase().includes('medical')) ||
+                   Object.keys(record).some(key => key.toLowerCase().includes('record'));
+        }
+
+        function containsAccountNumber(record) {
+            return Object.keys(record).some(key => key.toLowerCase().includes('account')) ||
+                   Object.values(record).some(val => typeof val === 'string' && val.match(/^\d{8,20}$/));
+        }
+
+        function containsCreditCard(record) {
+            return Object.values(record).some(val => typeof val === 'string' && val.match(/^\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{1,4}$/));
+        }
+
+        // Enhanced region and classification extraction
+        function extractRegionsAndClassifications(record, characteristics) {
+            Object.values(record).forEach(value => {
+                if (typeof value === 'string') {
+                    const v = value.toLowerCase();
+                    
+                    // Enhanced region detection
+                    if (v.includes('eu') || v.includes('european union') || v.includes('eea')) {
+                        characteristics.regions.add('EU');
+                    }
+                    if (v.includes('us') || v.includes('america') || v.includes('usa') || v.includes('united states')) {
+                        characteristics.regions.add('US');
+                    }
+                    if (v.includes('california') || v === 'ca' || v.includes('san francisco') || v.includes('los angeles')) {
+                        characteristics.regions.add('California');
+                    }
+                    if (v.includes('texas') || v === 'tx' || v.includes('dallas') || v.includes('austin')) {
+                        characteristics.regions.add('Texas');
+                    }
+                    if (v.includes('colorado') || v === 'co' || v.includes('denver')) {
+                        characteristics.regions.add('Colorado');
+                    }
+                    if (v.includes('canada') || v.includes('ontario') || v.includes('quebec')) {
+                        characteristics.regions.add('Canada');
+                    }
+                    if (v.includes('uk') || v.includes('united kingdom') || v.includes('britain')) {
+                        characteristics.regions.add('UK');
+                    }
+
+                    // Enhanced classification detection
+                    if (v.includes('top secret') || v.includes('secret')) {
+                        characteristics.classifications.add('Top Secret');
+                    } else if (v.includes('confidential')) {
+                        characteristics.classifications.add('Confidential');
+                    } else if (v.includes('sensitive') || v.includes('restricted')) {
+                        characteristics.classifications.add('Sensitive');
+                    } else if (v.includes('internal') || v.includes('private')) {
+                        characteristics.classifications.add('Internal');
+                    } else if (v.includes('public')) {
+                        characteristics.classifications.add('Public');
+                    }
+
+                    // Data sensitivity indicators
+                    if (v.includes('highly sensitive') || v.includes('special category')) {
+                        characteristics.classifications.add('Highly Sensitive');
+                    }
+                    if (v.includes('personal data') || v.includes('personal information')) {
+                        characteristics.classifications.add('Personal Data');
+                    }
+                }
+            });
+        }
+
+        // Finalize data type detection based on column analysis
+        function finalizeDataTypeDetection(characteristics) {
+            Object.values(characteristics.columnAnalysis).forEach(col => {
+                // Add data types based on column analysis
+                if (col.dataType === 'email' || col.dataType === 'phone' || col.dataType === 'name' || col.dataType === 'ssn') {
+                    characteristics.hasPersonalData = true;
+                }
+                if (col.dataType === 'credit_card' || col.dataType === 'ssn') {
+                    characteristics.hasFinancialData = true;
+                }
+                if (col.hasEncryptedFields || col.sensitivityLevel === 'high') {
+                    characteristics.dataTypes.add('encrypted_data');
+                }
+                if (col.patterns.includes('health_related')) {
+                    characteristics.hasHealthData = true;
+                }
+                if (col.patterns.includes('biometric')) {
+                    characteristics.hasBiometricData = true;
+                }
+                if (col.patterns.includes('coordinates')) {
+                    characteristics.hasLocationData = true;
+                }
+            });
+        }
+
+        // Enhanced Framework Relevance Calculation with intelligent scoring
+        function calculateFrameworkRelevance(framework, characteristics) {
+            let score = 0;
+            const code = framework.code.toLowerCase();
+            const name = framework.name.toLowerCase();
+
+            // GDPR - Enhanced logic with specific data type detection
+            if ((code.includes('gdpr') || name.includes('gdpr'))) {
+                if (characteristics.hasPersonalData) {
+                    score += characteristics.regions.has('EU') ? 95 : 80;
+                    // Bonus for special category data
+                    if (characteristics.hasHealthData || characteristics.hasBiometricData) {
+                        score += 15;
+                    }
+                    // Bonus for location in EEA countries
+                    if (characteristics.regions.has('UK') || characteristics.regions.has('Canada')) {
+                        score += 10;
+                    }
+                }
+            }
+
+            // HIPAA - Enhanced healthcare data detection
+            if ((code.includes('hipaa') || name.includes('hipaa'))) {
+                if (characteristics.hasHealthData) {
+                    score += characteristics.regions.has('US') ? 95 : 70;
+                    // Bonus for Protected Health Information (PHI)
+                    if (characteristics.hasBiometricData || characteristics.hasLocationData) {
+                        score += 20;
+                    }
+                }
+                // HIPAA also covers healthcare operations and payment processing
+                if (characteristics.hasFinancialData && characteristics.regions.has('US')) {
+                    score += 30;
+                }
+            }
+
+            // PCI DSS - Enhanced payment card data detection
+            if ((code.includes('pci') || code.includes('payment card'))) {
+                const hasPaymentData = characteristics.hasFinancialData || 
+                    Object.values(characteristics.columnAnalysis).some(col => 
+                        col.dataType === 'credit_card' || 
+                        col.patterns.includes('credit_card_number'));
+                if (hasPaymentData) {
+                    score += 90;
+                    // Bonus for unencrypted payment data
+                    if (!Object.values(characteristics.columnAnalysis).some(col => col.hasEncryptedFields)) {
+                        score += 10;
+                    }
+                }
+            }
+
+            // SOC 2 - Enhanced service organization controls
+            if ((code.includes('soc') || name.includes('service organization'))) {
+                const serviceOrgIndicators = characteristics.hasPersonalData || 
+                    characteristics.hasAIData || 
+                    characteristics.hasLocationData ||
+                    characteristics.hasBehavioralData;
+                if (serviceOrgIndicators) {
+                    score += 75;
+                    // Bonus for multiple data types indicating complex service
+                    const dataTypeCount = [
+                        characteristics.hasPersonalData,
+                        characteristics.hasFinancialData,
+                        characteristics.hasAIData,
+                        characteristics.hasLocationData,
+                        characteristics.hasBehavioralData
+                    ].filter(Boolean).length;
+                    score += dataTypeCount * 5;
+                }
+            }
+
+            // ISO 42001 - AI Management System
+            if ((code.includes('iso 42001') || name.includes('ai management') || name.includes('iso 42001'))) {
+                if (characteristics.hasAIData) {
+                    score += 85;
+                    // Bonus for high-risk AI applications
+                    if (characteristics.hasPersonalData || characteristics.hasHealthData) {
+                        score += 15;
+                    }
+                }
+            }
+
+            // EU AI Act
+            if (name.includes('eu ai act') || code.includes('eu ai')) {
+                if (characteristics.hasAIData) {
+                    score += characteristics.regions.has('EU') ? 95 : 60;
+                    // High-risk AI system indicators
+                    const highRiskIndicators = [
+                        characteristics.hasBiometricData,
+                        characteristics.hasCriticalInfrastructure,
+                        (characteristics.hasPersonalData && characteristics.hasAIData),
+                        (characteristics.hasHealthData && characteristics.hasAIData)
+                    ].filter(Boolean).length;
+                    score += highRiskIndicators * 10;
+                }
+            }
+
+            // NIST AI Risk Management
+            if (name.includes('nist') && name.includes('ai')) {
+                if (characteristics.hasAIData) {
+                    score += 80;
+                    // Bonus for US-based operations
+                    if (characteristics.regions.has('US')) {
+                        score += 15;
+                    }
+                }
+            }
+
+            // Regional AI laws - Enhanced scoring
+            if (name.includes('california') && (name.includes('ai') || code.includes('california'))) {
+                if (characteristics.hasAIData && characteristics.regions.has('California')) {
+                    score += 95;
+                } else if (characteristics.hasAIData) {
+                    score += 30;
+                }
+            }
+
+            if (name.includes('texas') && (name.includes('ai') || code.includes('texas'))) {
+                if (characteristics.hasAIData && characteristics.regions.has('Texas')) {
+                    score += 95;
+                } else if (characteristics.hasAIData) {
+                    score += 30;
+                }
+            }
+
+            if (name.includes('colorado') && (name.includes('ai') || code.includes('colorado'))) {
+                if (characteristics.hasAIData && characteristics.regions.has('Colorado')) {
+                    score += 95;
+                } else if (characteristics.hasAIData) {
+                    score += 30;
+                }
+            }
+
+            // IEEE Ethically Aligned Design
+            if (name.includes('ieee') || name.includes('ethically aligned')) {
+                if (characteristics.hasAIData || characteristics.hasPersonalData) {
+                    score += 70;
+                    // Bonus for ethical AI considerations
+                    if (characteristics.hasBiometricData || characteristics.hasBehavioralData) {
+                        score += 15;
+                    }
+                }
+            }
+
+            // OWASP LLM Security
+            if (name.includes('owasp') || name.includes('llm')) {
+                if (characteristics.hasAIData) {
+                    score += 85;
+                    // Check for LLM-specific indicators
+                    const llmIndicators = characteristics.hasPersonalData || 
+                        characteristics.hasBehavioralData ||
+                        Object.values(characteristics.columnAnalysis).some(col => 
+                            col.dataType === 'text' && col.sensitivityLevel === 'high');
+                    if (llmIndicators) {
+                        score += 10;
+                    }
+                }
+            }
+
+            // ISO/Security frameworks for sensitive data
+            if ((code.includes('iso') || code.includes('security'))) {
+                const sensitiveDataFlags = [
+                    characteristics.classifications.has('Top Secret'),
+                    characteristics.classifications.has('Highly Sensitive'),
+                    characteristics.classifications.has('Confidential'),
+                    characteristics.classifications.has('Sensitive'),
+                    Object.values(characteristics.columnAnalysis).some(col => col.sensitivityLevel === 'high')
+                ].filter(Boolean).length;
+
+                if (sensitiveDataFlags > 0) {
+                    score += sensitiveDataFlags * 20;
+                    
+                    // Specific ISO standards
+                    if (code.includes('27001') || name.includes('27001')) {
+                        score += 30;
+                    }
+                    if (code.includes('27701') || name.includes('27701')) {
+                        if (characteristics.hasPersonalData) {
+                            score += 25;
+                        }
+                    }
+                }
+            }
+
+            // CRA (Cyber Resilience Act)
+            if (code.includes('cra') || name.includes('cyber resilience')) {
+                const cyberRiskIndicators = [
+                    characteristics.hasPersonalData,
+                    characteristics.hasFinancialData,
+                    characteristics.hasCriticalInfrastructure,
+                    characteristics.hasAIData
+                ].filter(Boolean).length;
+
+                if (cyberRiskIndicators > 0) {
+                    score += cyberRiskIndicators * 15;
+                    // EU context bonus
+                    if (characteristics.regions.has('EU') || characteristics.regions.has('UK')) {
+                        score += 20;
+                    }
+                }
+            }
+
+            // SOX (Sarbanes-Oxley) for financial data
+            if (code.includes('sox') || name.includes('sarbanes') || name.includes('sox')) {
+                if (characteristics.hasFinancialData) {
+                    score += 85;
+                    // US public company context
+                    if (characteristics.regions.has('US')) {
+                        score += 10;
+                    }
+                }
+            }
+
+            // Responsible AI Framework
+            if (name.includes('responsible') && name.includes('ai')) {
+                if (characteristics.hasAIData) {
+                    score += 75;
+                    // Bonus for high-impact AI decisions
+                    if (characteristics.hasPersonalData || characteristics.hasFinancialData) {
+                        score += 15;
+                    }
+                }
+            }
+
+            // Enhanced scoring based on data complexity
+            const dataTypeCount = [
+                characteristics.hasPersonalData,
+                characteristics.hasHealthData,
+                characteristics.hasFinancialData,
+                characteristics.hasAIData,
+                characteristics.hasBiometricData,
+                characteristics.hasLocationData,
+                characteristics.hasBehavioralData
+            ].filter(Boolean).length;
+
+            if (dataTypeCount > 2) {
+                score += dataTypeCount * 5; // Bonus for complex data landscape
+            }
+
+            // Penalty for frameworks that don't match the data profile
+            if (score > 0) {
+                // Ensure minimum relevance threshold
+                score = Math.max(score, 25);
+            }
+
+            return score;
+        }
+
+        // Enhanced Recommendation Reasons with detailed explanations
+        function getRecommendationReasons(framework, characteristics) {
+            const reasons = [];
+            const code = framework.code.toLowerCase();
+            const name = framework.name.toLowerCase();
+
+            // GDPR specific reasons
+            if (code.includes('gdpr')) {
+                if (characteristics.hasPersonalData) {
+                    if (characteristics.regions.has('EU')) {
+                        reasons.push('EU-based personal data requires GDPR compliance with potential fines up to €20M or 4% of global revenue');
+                    } else {
+                        reasons.push('Personal data detected - GDPR compliance may apply for EU data subjects and cross-border transfers');
+                    }
+                    
+                    // Special category data indicators
+                    if (characteristics.hasHealthData || characteristics.hasBiometricData) {
+                        reasons.push('Special category personal data (health/biometric) requires enhanced GDPR protections (Article 9)');
+                    }
+                }
+                
+                // Data processing purpose analysis
+                const processingIndicators = ['marketing', 'profiling', 'automated decision', 'cross-border'];
+                if (processingIndicators.some(indicator => name.includes(indicator))) {
+                    reasons.push('Automated decision-making or profiling requires additional GDPR compliance measures');
+                }
+            }
+
+            // HIPAA specific reasons
+            if (code.includes('hipaa')) {
+                if (characteristics.hasHealthData) {
+                    reasons.push('Healthcare data detected - HIPAA compliance required for Protected Health Information (PHI)');
+                    
+                    if (characteristics.regions.has('US')) {
+                        reasons.push('US healthcare operations mandate HIPAA compliance with penalties up to $1.5M per violation');
+                    }
+                    
+                    if (characteristics.hasBiometricData) {
+                        reasons.push('Biometric health data requires enhanced HIPAA security and privacy safeguards');
+                    }
+                }
+                
+                // Business associate indicators
+                if (characteristics.hasFinancialData) {
+                    reasons.push('Healthcare payment processing data may trigger HIPAA business associate requirements');
+                }
+            }
+
+            // PCI DSS specific reasons
+            if (code.includes('pci')) {
+                const hasPaymentData = characteristics.hasFinancialData || 
+                    Object.values(characteristics.columnAnalysis).some(col => 
+                        col.dataType === 'credit_card');
+                        
+                if (hasPaymentData) {
+                    reasons.push('Payment card data detected - PCI DSS compliance required for cardholder data environment');
+                    
+                    const hasUnencryptedData = Object.values(characteristics.columnAnalysis).some(col => 
+                        !col.hasEncryptedFields && (col.dataType === 'credit_card'));
+                    if (hasUnencryptedData) {
+                        reasons.push('Unencrypted payment card data poses immediate PCI DSS compliance risk');
+                    }
+                    
+                    reasons.push('PCI DSS non-compliance can result in fines, increased processing fees, and loss of payment processing privileges');
+                }
+            }
+
+            // SOC 2 specific reasons
+            if (code.includes('soc')) {
+                const serviceOrgIndicators = [
+                    characteristics.hasPersonalData,
+                    characteristics.hasAIData,
+                    characteristics.hasLocationData,
+                    characteristics.hasBehavioralData
+                ].filter(Boolean).length;
+                
+                if (serviceOrgIndicators > 0) {
+                    reasons.push('Service organization controls (SOC 2) required for customer data processing and service delivery');
+                    
+                    const dataTypes = [];
+                    if (characteristics.hasPersonalData) dataTypes.push('personal data');
+                    if (characteristics.hasAIData) dataTypes.push('AI/ML data');
+                    if (characteristics.hasLocationData) dataTypes.push('location data');
+                    if (characteristics.hasBehavioralData) dataTypes.push('behavioral data');
+                    
+                    if (dataTypes.length > 1) {
+                        reasons.push(`Multiple data types (${dataTypes.join(', ')}) require comprehensive SOC 2 controls`);
+                    }
+                }
+            }
+
+            // ISO frameworks specific reasons
+            if (code.includes('iso')) {
+                const sensitiveDataFlags = [
+                    characteristics.classifications.has('Top Secret'),
+                    characteristics.classifications.has('Highly Sensitive'),
+                    characteristics.classifications.has('Confidential'),
+                    characteristics.classifications.has('Sensitive')
+                ].filter(Boolean).length;
+
+                if (sensitiveDataFlags > 0) {
+                    const classifications = Array.from(characteristics.classifications)
+                        .filter(c => ['Top Secret', 'Highly Sensitive', 'Confidential', 'Sensitive'].includes(c));
+                    reasons.push(`${classifications.join(', ')} data requires ISO 27001/27002 security management controls`);
+                    
+                    if (characteristics.classifications.has('Personal Data') || characteristics.hasPersonalData) {
+                        reasons.push('Personal data processing requires ISO 27701 privacy information management system');
+                    }
+                }
+            }
+
+            // AI-specific framework reasons
+            if (name.includes('ai') || code.includes('ai')) {
+                if (characteristics.hasAIData) {
+                    reasons.push('AI/ML system data detected - AI governance framework required for responsible AI implementation');
+                    
+                    // High-risk AI system indicators
+                    const highRiskIndicators = [
+                        characteristics.hasBiometricData,
+                        characteristics.hasCriticalInfrastructure,
+                        (characteristics.hasPersonalData && characteristics.hasAIData),
+                        (characteristics.hasHealthData && characteristics.hasAIData)
+                    ].filter(Boolean).length;
+                    
+                    if (highRiskIndicators > 0) {
+                        reasons.push('High-risk AI system indicators detected - enhanced AI governance and risk management required');
+                    }
+                }
+            }
+
+            // Regional AI law reasons
+            if (name.includes('california') && name.includes('ai')) {
+                if (characteristics.regions.has('California')) {
+                    reasons.push('California AI data processing requires compliance with California AI transparency and safety laws');
+                } else {
+                    reasons.push('AI data processing may require California AI law compliance for California residents/users');
+                }
+            }
+
+            if (name.includes('texas') && name.includes('ai')) {
+                if (characteristics.regions.has('Texas')) {
+                    reasons.push('Texas AI operations require compliance with Texas Responsible AI Governance Act (TRAIGA)');
+                } else {
+                    reasons.push('AI data processing may require Texas AI governance compliance for Texas operations');
+                }
+            }
+
+            if (name.includes('colorado') && name.includes('ai')) {
+                if (characteristics.regions.has('Colorado')) {
+                    reasons.push('Colorado AI data requires compliance with Colorado AI Protection Act consumer protections');
+                } else {
+                    reasons.push('AI data processing may require Colorado AI protection compliance for Colorado consumers');
+                }
+            }
+
+            // IEEE Ethically Aligned Design
+            if (name.includes('ieee') || name.includes('ethically aligned')) {
+                if (characteristics.hasAIData || characteristics.hasPersonalData) {
+                    reasons.push('AI system with personal/data requires IEEE Ethically Aligned Design principles for ethical implementation');
+                    
+                    if (characteristics.hasBiometricData || characteristics.hasBehavioralData) {
+                        reasons.push('Biometric/behavioral AI applications require enhanced ethical oversight per IEEE standards');
+                    }
+                }
+            }
+
+            // OWASP LLM Security
+            if (name.includes('owasp') || name.includes('llm')) {
+                if (characteristics.hasAIData) {
+                    reasons.push('LLM/AI data requires OWASP LLM security controls for secure AI system deployment');
+                    
+                    const securityRisks = characteristics.hasPersonalData || 
+                        characteristics.hasBehavioralData ||
+                        Object.values(characteristics.columnAnalysis).some(col => 
+                            col.sensitivityLevel === 'high');
+                    if (securityRisks) {
+                        reasons.push('High-sensitivity AI data requires comprehensive OWASP LLM Top 10 security framework');
+                    }
+                }
+            }
+
+            // Cyber Resilience Act (CRA)
+            if (code.includes('cra') || name.includes('cyber resilience')) {
+                const cyberRiskFactors = [
+                    characteristics.hasPersonalData,
+                    characteristics.hasFinancialData,
+                    characteristics.hasCriticalInfrastructure,
+                    characteristics.hasAIData
+                ].filter(Boolean).length;
+
+                if (cyberRiskFactors > 0) {
+                    reasons.push('Digital product/service with risk factors requires EU Cyber Resilience Act compliance');
+                    
+                    if (characteristics.regions.has('EU') || characteristics.regions.has('UK')) {
+                        reasons.push('EU/UK market access requires CRA compliance for digital products with cybersecurity risks');
+                    }
+                    
+                    if (cyberRiskFactors > 2) {
+                        reasons.push('Multiple cybersecurity risk factors require comprehensive CRA security requirements');
+                    }
+                }
+            }
+
+            // SOX specific reasons
+            if (code.includes('sox') || name.includes('sarbanes')) {
+                if (characteristics.hasFinancialData) {
+                    reasons.push('Financial data processing requires Sarbanes-Oxley (SOX) compliance for US public companies');
+                    
+                    if (characteristics.regions.has('US')) {
+                        reasons.push('US public company financial data mandates SOX internal controls and compliance certification');
+                    }
+                    
+                    reasons.push('SOX non-compliance can result in SEC enforcement actions and criminal penalties');
+                }
+            }
+
+            // Generic framework reasons for unmapped data
+            if (reasons.length === 0) {
+                if (characteristics.hasPersonalData) {
+                    reasons.push('Personal data processing requires general data protection and privacy compliance measures');
+                }
+                if (characteristics.hasFinancialData) {
+                    reasons.push('Financial data processing requires financial services compliance and security controls');
+                }
+                if (characteristics.hasAIData) {
+                    reasons.push('AI data processing requires AI governance and responsible AI implementation frameworks');
+                }
+            }
+
+            // Add urgency indicators
+            const urgencyFactors = [];
+            if (characteristics.classifications.has('Top Secret')) {
+                urgencyFactors.push('highest sensitivity classification requires immediate compliance assessment');
+            }
+            if (Object.values(characteristics.columnAnalysis).some(col => col.sensitivityLevel === 'high')) {
+                urgencyFactors.push('high-sensitivity data columns detected require urgent compliance evaluation');
+            }
+            if (characteristics.hasCriticalInfrastructure) {
+                urgencyFactors.push('critical infrastructure data requires prioritized compliance due to national security implications');
+            }
+
+            if (urgencyFactors.length > 0) {
+                reasons.push('URGENT: ' + urgencyFactors.join('; '));
+            }
+
+            return reasons;
+        }
+
+        // Enhanced Data Catalogue Results Display with comprehensive analysis
+        function displayDataCatalogueResults(characteristics, recommendations) {
+            const resultsDiv = document.getElementById('dataCatalogueResults');
+            
+            // Calculate overall risk level
+            const riskLevel = calculateOverallRiskLevel(characteristics);
+            const topRecommendations = recommendations.slice(0, 6);
+            
+            let html = `
+                <div class="alert ${riskLevel.alertClass}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6><i class="fas fa-${riskLevel.icon} me-2"></i>Data Catalogue Analysis Complete</h6>
+                            <p class="mb-0">Analyzed ${characteristics.recordCount} records across ${Object.keys(characteristics.columnAnalysis).length} columns</p>
+                            <p class="mb-0"><strong>Overall Risk Level: ${riskLevel.level}</strong></p>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-${riskLevel.badgeClass} fs-6">${topRecommendations.length} Frameworks</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <h6 class="text-primary mb-3"><i class="fas fa-search me-2"></i>Data Analysis Summary</h6>
+                        
+                        <!-- Data Types Detected -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0"><i class="fas fa-database me-2"></i>Data Types Detected</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    ${getDataTypeCards(characteristics)}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Regional & Classification Analysis -->
+                        <div class="row mb-3">
+                            ${getRegionsSection(characteristics.regions)}
+                            ${getClassificationsSection(characteristics.classifications)}
+                        </div>
+
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <h6 class="text-primary mb-3"><i class="fas fa-target me-2"></i>Framework Recommendations</h6>
+                        
+                        ${topRecommendations.map((rec, index) => `
+                            <div class="card mb-3 ${index === 0 ? 'border-success' : ''}">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="fw-bold">${rec.framework.name}</div>
+                                        <span class="badge bg-${getScoreColor(rec.score)}">Recommended</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Code: ${rec.framework.code}</small>
+                                    </div>
+                                    <div class="reasons-section">
+                                        <small class="text-muted fw-bold">Why recommended:</small>
+                                        ${rec.reasons.slice(0, 3).map(reason => `
+                                            <small class="d-block text-muted mt-1">• ${reason}</small>
+                                        `).join('')}
+                                        ${rec.reasons.length > 3 ? `<small class="text-muted mt-1">+ ${rec.reasons.length - 3} more reasons</small>` : ''}
+                                    </div>
+                                    <div class="mt-3">
+                                        <button class="btn btn-sm btn-${index === 0 ? 'success' : 'outline-primary'} w-100" 
+                                                onclick="startAssessment('${rec.framework.code}')">
+                                            ${index === 0 ? '<i class="fas fa-star me-1"></i>' : ''}Start Assessment
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+
+
+                    </div>
+                </div>
+            `;
+
+            resultsDiv.innerHTML = html;
+        }
+
+        // Calculate overall risk level based on data characteristics
+        function calculateOverallRiskLevel(characteristics) {
+            let riskScore = 0;
+            
+            // High-risk indicators
+            if (characteristics.hasHealthData) riskScore += 25;
+            if (characteristics.hasFinancialData) riskScore += 20;
+            if (characteristics.hasBiometricData) riskScore += 30;
+            if (characteristics.hasCriticalInfrastructure) riskScore += 35;
+            if (characteristics.classifications.has('Top Secret')) riskScore += 40;
+            if (characteristics.classifications.has('Highly Sensitive')) riskScore += 30;
+            
+            // Moderate-risk indicators
+            if (characteristics.hasPersonalData) riskScore += 15;
+            if (characteristics.hasAIData) riskScore += 15;
+            if (characteristics.hasLocationData) riskScore += 10;
+            if (characteristics.hasBehavioralData) riskScore += 10;
+            if (characteristics.classifications.has('Confidential')) riskScore += 15;
+            if (characteristics.classifications.has('Sensitive')) riskScore += 10;
+            
+            // Regional risk factors
+            if (characteristics.regions.has('EU')) riskScore += 5;
+            if (characteristics.regions.has('California')) riskScore += 10;
+            if (characteristics.regions.has('Texas')) riskScore += 10;
+            if (characteristics.regions.has('Colorado')) riskScore += 10;
+            
+            // Column complexity
+            const highSensitivityColumns = Object.values(characteristics.columnAnalysis)
+                .filter(col => col.sensitivityLevel === 'high').length;
+            riskScore += highSensitivityColumns * 5;
+            
+            if (riskScore >= 60) {
+                return { level: 'CRITICAL', alertClass: 'alert-danger', badgeClass: 'danger', icon: 'exclamation-triangle' };
+            } else if (riskScore >= 40) {
+                return { level: 'HIGH', alertClass: 'alert-warning', badgeClass: 'warning', icon: 'exclamation-circle' };
+            } else if (riskScore >= 20) {
+                return { level: 'MODERATE', alertClass: 'alert-info', badgeClass: 'info', icon: 'info-circle' };
+            } else {
+                return { level: 'LOW', alertClass: 'alert-success', badgeClass: 'success', icon: 'check-circle' };
+            }
+        }
+
+        // Get data type detection cards
+        function getDataTypeCards(characteristics) {
+            const dataTypes = [
+                { key: 'hasPersonalData', label: 'Personal Data', icon: 'user', color: 'warning', desc: 'PII, customer data, profiles' },
+                { key: 'hasHealthData', label: 'Health Data', icon: 'heartbeat', color: 'danger', desc: 'Medical, clinical, patient data' },
+                { key: 'hasFinancialData', label: 'Financial Data', icon: 'dollar-sign', color: 'success', desc: 'Payments, accounts, transactions' },
+                { key: 'hasAIData', label: 'AI/ML Data', icon: 'robot', color: 'info', desc: 'ML models, training data, algorithms' },
+                { key: 'hasBiometricData', label: 'Biometric Data', icon: 'fingerprint', color: 'purple', desc: 'Face, fingerprint, voice data' },
+                { key: 'hasLocationData', label: 'Location Data', icon: 'map-marker-alt', color: 'primary', desc: 'GPS, coordinates, addresses' },
+                { key: 'hasBehavioralData', label: 'Behavioral Data', icon: 'chart-line', color: 'secondary', desc: 'User behavior, preferences' },
+                { key: 'hasCriticalInfrastructure', label: 'Critical Infrastructure', icon: 'industry', color: 'dark', desc: 'Essential services, utilities' }
+            ];
+            
+            return dataTypes.map(type => `
+                <div class="col-md-6 mb-2">
+                    ${characteristics[type.key] ? `
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-${type.icon} text-${type.color} me-2"></i>
+                            <div>
+                                <div class="fw-bold">${type.label}</div>
+                                <small class="text-muted">${type.desc}</small>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Get column analysis section
+        function getColumnAnalysisSection(columnAnalysis) {
+            if (Object.keys(columnAnalysis).length === 0) return '';
+            
+            const highSensitivityColumns = Object.entries(columnAnalysis)
+                .filter(([_, col]) => col.sensitivityLevel === 'high');
+            const mediumSensitivityColumns = Object.entries(columnAnalysis)
+                .filter(([_, col]) => col.sensitivityLevel === 'moderate');
+            
+            let html = `
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <h6 class="mb-0"><i class="fas fa-columns me-2"></i>Column Analysis (${Object.keys(columnAnalysis).length} columns)</h6>
+                    </div>
+                    <div class="card-body">
+            `;
+            
+            // High sensitivity columns
+            if (highSensitivityColumns.length > 0) {
+                html += `
+                    <div class="mb-3">
+                        <h6 class="text-danger"><i class="fas fa-exclamation-triangle me-2"></i>High Sensitivity Columns</h6>
+                        <div class="row">
+                            ${highSensitivityColumns.map(([name, col]) => `
+                                <div class="col-md-6 mb-2">
+                                    <div class="border border-danger rounded p-2">
+                                        <div class="fw-bold">${col.headerName}</div>
+                                        <small class="text-muted">Type: ${col.dataType}</small>
+                                        ${col.patterns.length > 0 ? `<br><small class="text-muted">Patterns: ${col.patterns.join(', ')}</small>` : ''}
+                                        ${col.hasEncryptedFields ? '<br><small class="text-warning">Encrypted Data</small>' : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Medium sensitivity columns
+            if (mediumSensitivityColumns.length > 0) {
+                html += `
+                    <div class="mb-3">
+                        <h6 class="text-warning"><i class="fas fa-exclamation-circle me-2"></i>Moderate Sensitivity Columns</h6>
+                        <div class="row">
+                            ${mediumSensitivityColumns.slice(0, 6).map(([name, col]) => `
+                                <div class="col-md-4 mb-2">
+                                    <div class="border border-warning rounded p-2">
+                                        <div class="fw-bold">${col.headerName}</div>
+                                        <small class="text-muted">Type: ${col.dataType}</small>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
+            return html;
+        }
+
+        // Get regions section
+        function getRegionsSection(regions) {
+            if (regions.size === 0) return '<div class="col-md-6"></div>';
+            
+            return `
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="fas fa-globe me-2"></i>Geographic Regions</h6>
+                        </div>
+                        <div class="card-body">
+                            ${Array.from(regions).map(region => `
+                                <span class="badge bg-primary me-1 mb-1">${region}</span>
+                            `).join('')}
+                            <small class="text-muted d-block mt-2">Jurisdictional compliance requirements may apply</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Get classifications section
+        function getClassificationsSection(classifications) {
+            if (classifications.size === 0) return '<div class="col-md-6"></div>';
+            
+            return `
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Data Classifications</h6>
+                        </div>
+                        <div class="card-body">
+                            ${Array.from(classifications).map(classification => `
+                                <span class="badge bg-${getClassificationColor(classification)} me-1 mb-1">${classification}</span>
+                            `).join('')}
+                            <small class="text-muted d-block mt-2">Security and privacy controls required</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Get recommendation priority color
+        function getScoreColor(score) {
+            if (score >= 80) return 'success';  // High priority
+            if (score >= 60) return 'warning';  // Medium priority
+            return 'secondary'; // Low priority
+        }
+
+        // Get classification color
+        function getClassificationColor(classification) {
+            const colorMap = {
+                'Top Secret': 'danger',
+                'Highly Sensitive': 'danger',
+                'Confidential': 'warning',
+                'Sensitive': 'warning',
+                'Internal': 'info',
+                'Public': 'success'
+            };
+            return colorMap[classification] || 'secondary';
+        }
+
+        // Show Data Catalogue Template
+        function showDataCatalogueTemplate() {
+            const template = [
+                {
+                    data_name: "Customer Database",
+                    data_description: "Customer personal information including names, emails, addresses",
+                    data_classification: "Confidential",
+                    region: "US, EU",
+                    data_type: "Personal Data",
+                    retention_period: "7 years",
+                    access_level: "Restricted"
+                },
+                {
+                    data_name: "AI Training Dataset",
+                    data_description: "Machine learning training data for recommendation engine",
+                    data_classification: "Sensitive", 
+                    region: "California",
+                    data_type: "AI/ML Data",
+                    retention_period: "5 years",
+                    access_level: "Controlled"
+                }
+            ];
+
+            const csvContent = "data_name,data_description,data_classification,region,data_type,retention_period,access_level\n" +
+                template.map(row => Object.values(row).map(v => `"${v}"`).join(',')).join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'data_catalogue_template.csv';
+            link.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Force Logout Function
+        function forceLogout() {
+            console.log('🚪 Force logout initiated');
+            localStorage.clear();
+            currentUser = null;
+            location.reload();
+        }
+
+        // Add force logout button if user is logged in
+        function addForceLogoutButton() {
+            if (currentUser) {
+                const button = document.createElement('button');
+                button.className = 'btn btn-danger btn-lg force-logout-btn';
+                button.innerHTML = '<i class="fas fa-sign-out-alt me-2"></i>Force Logout';
+                button.onclick = forceLogout;
+                document.body.appendChild(button);
+                console.log('🔄 Force logout button added');
+            }
+        }
+
+    </script>
+
+    <!-- Force Logout Button (will be hidden until user logs in) -->
+    <button class="btn btn-danger btn-lg force-logout-btn" onclick="forceLogout()" style="display: none;">
+        <i class="fas fa-sign-out-alt me-2"></i>Force Logout
+    </button>
+
+</body>
+</html>

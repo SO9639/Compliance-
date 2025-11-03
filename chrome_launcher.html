@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRA Tool - Chrome Launcher</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .launcher-card {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="launcher-card">
+            <h1 class="text-center mb-4 text-primary">🚀 CRA Assessment Tool - Chrome Launcher</h1>
+            
+            <div class="alert alert-success">
+                <h4>Ready to Launch!</h4>
+                <p>Click the button below to automatically clear authentication and open the main application.</p>
+            </div>
+            
+            <div class="text-center">
+                <button onclick="launchApp()" class="btn btn-success btn-lg">
+                    🚀 Launch CRA Assessment Tool
+                </button>
+            </div>
+            
+            <div id="status" class="mt-4"></div>
+            
+            <hr>
+            
+            <div class="text-center">
+                <h5>Demo Accounts (Ready to Use)</h5>
+                <div class="row g-3 mt-3">
+                    <div class="col-md-4">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <h6 class="text-primary">Admin</h6>
+                                <p><strong>Username:</strong> admin<br>
+                                <strong>Password:</strong> admin123</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-success">
+                            <div class="card-body text-center">
+                                <h6 class="text-success">Analyst</h6>
+                                <p><strong>Username:</strong> analyst<br>
+                                <strong>Password:</strong> analyst123</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-info">
+                            <div class="card-body text-center">
+                                <h6 class="text-info">Auditor</h6>
+                                <p><strong>Username:</strong> auditor<br>
+                                <strong>Password:</strong> auditor123</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert alert-warning mt-4">
+                <h6>Having issues with this page?</h6>
+                <ol>
+                    <li>Make sure this file is in the same folder as <code>index.html</code></li>
+                    <li>Try dragging and dropping this file into Chrome</li>
+                    <li>If still not working: Press F12 → Console → Type <code>localStorage.clear()</code> → Press Enter → Type <code>location.reload()</code> → Press Enter</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            const alertClass = type === 'success' ? 'alert-success' : 
+                               type === 'error' ? 'alert-danger' : 'alert-info';
+            statusDiv.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+        }
+        
+        function launchApp() {
+            try {
+                showStatus('🧹 Clearing authentication data...', 'info');
+                
+                // Clear all browser storage
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                setTimeout(() => {
+                    showStatus('✅ Data cleared! Opening main application...', 'success');
+                    
+                    // Try to find and open the index.html file
+                    setTimeout(() => {
+                        try {
+                            // Since this file should be in the same folder as index.html
+                            window.location.href = './index.html';
+                        } catch (e) {
+                            showStatus('⚠️ Could not open main app automatically. Please manually open index.html from the enhanced_cra_tool folder.', 'error');
+                        }
+                    }, 1000);
+                    
+                }, 500);
+                
+            } catch (error) {
+                showStatus('❌ Error: ' + error.message + '. Try manual method: Press F12 → Console → Type localStorage.clear()', 'error');
+            }
+        }
+        
+        // Check status on load
+        window.onload = function() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                showStatus('⚠️ Authentication data detected. Click the launch button to clear it and proceed.', 'warning');
+            } else {
+                showStatus('✅ Ready to launch! No authentication data detected.', 'success');
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+DataTableName,DataDescription,DataClassification,Region,DataType,ColumnName,SampleValues,SensitivityLevel,PatternDetected,EncryptionStatus
+Customer Database,Customer personal information including names, emails, addresses and phone numbers,Confidential,US;EU,Personal Data,FirstName,"John, Jane, Michael",High,name_pattern,No
+Customer Database,Customer personal information including names, emails, addresses and phone numbers,Confidential,US;EU,Personal Data,LastName,"Smith, Johnson, Brown",High,name_pattern,No
+Customer Database,Customer personal information including names, emails, addresses and phone numbers,Confidential,US;EU,Personal Data,Email,"john.smith@email.com, jane.doe@company.com",High,email_pattern,No
+Customer Database,Customer personal information including names, emails, addresses and phone numbers,Confidential,US;EU,Personal Data,Phone,"555-123-4567, 555-987-6543",High,phone_pattern,No
+Customer Database,Customer personal information including names, emails, addresses and phone numbers,Confidential,US;EU,Personal Data,Address,"123 Main St, 456 Oak Ave",Medium,address_pattern,No
+Patient Records,Medical information including patient IDs diagnoses and treatment data,Sensitive,US,Health Data,PatientID,"MR001, MR002, MR003",High,medical_record_pattern,Yes
+Patient Records,Medical information including patient IDs diagnoses and treatment data,Sensitive,US,Health Data,DOB,"1990-01-15, 1985-06-22, 1978-03-10",High,date_pattern,Yes
+Patient Records,Medical information including patient IDs diagnoses and treatment data,Sensitive,US,Health Data,Diagnosis,"Diabetes, Hypertension, Cancer",Medium,health_related,Yes
+Payment Transactions,Credit card and payment transaction data,Confidential,US;EU,Financial Data,CreditCard,"4532-1234-5678-9012, 5555-4444-3333-2222",High,credit_card_number,Partially
+Payment Transactions,Credit card and payment transaction data,Confidential,US;EU,Financial Data,TransactionAmount,"$150.00, $250.75, $75.25",Medium,monetary_amount,Yes
+AI Training Dataset,Machine learning training data for customer behavior prediction,Internal,California;EU,AI Data,UserBehavior,"clicked, viewed, purchased",Moderate,behavioral_pattern,Yes
+AI Training Dataset,Machine learning training data for customer behavior prediction,Internal,California;EU,AI Data,ModelFeatures,"age, income, location",Moderate,ai_features,Yes
+Biometric Data,Fingerprint and facial recognition templates for security access,Top Secret,US,Biometric Data,FingerprintTemplate,"EncodedBinaryData...",High,biometric_template,Yes
+Biometric Data,Fingerprint and facial recognition templates for security access,Top Secret,US,Biometric Data,FaceEncoding,"base64EncodedFaceData...",High,biometric_template,Yes

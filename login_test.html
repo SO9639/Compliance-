@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Login Modal Test</h1>
+        <button onclick="showTestLogin()" class="btn btn-primary">Test Login Modal</button>
+        <button onclick="clearStorage()" class="btn btn-warning">Clear LocalStorage</button>
+    </div>
+
+    <!-- Test Login Modal -->
+    <div class="modal fade" id="testLoginModal" tabindex="-1" aria-labelledby="testLoginModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="testLoginModalLabel">Test Login Modal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This is a simple test to verify the login modal works.</p>
+                    <p><strong>Demo Accounts:</strong></p>
+                    <ul>
+                        <li>Admin: admin / admin123</li>
+                        <li>Analyst: analyst / analyst123</li>
+                        <li>Auditor: auditor / auditor123</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showTestLogin() {
+            const modal = new bootstrap.Modal(document.getElementById('testLoginModal'));
+            modal.show();
+            console.log('🎭 Test modal shown');
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            alert('LocalStorage cleared! Now try refreshing the main app.');
+        }
+    </script>
+</body>
+</html>

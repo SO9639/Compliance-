@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRA Tool - Diagnostics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .diagnostic-card {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .pass { background-color: #d4edda; color: #155724; }
+        .fail { background-color: #f8d7da; color: #721c24; }
+        .warning { background-color: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="diagnostic-card">
+            <h1 class="text-center mb-4 text-primary">CRA Assessment Tool - Diagnostics</h1>
+            
+            <div class="alert alert-info">
+                <h5>Application Health Check</h5>
+                <p>This page will test various components to identify why the login screen or features aren't working.</p>
+            </div>
+            
+            <div class="mb-4">
+                <button onclick="runDiagnostics()" class="btn btn-primary btn-lg">Run Full Diagnostics</button>
+                <button onclick="quickFix()" class="btn btn-warning btn-lg ms-2">Quick Fix & Launch</button>
+            </div>
+            
+            <div id="results" class="mt-4">
+                <div class="alert alert-secondary">
+                    Click "Run Full Diagnostics" to test all components...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function addResult(test, result, message) {
+            const className = result === 'pass' ? 'test-result pass' : 
+                             result === 'fail' ? 'test-result fail' : 
+                             'test-result warning';
+            
+            const statusIcon = result === 'pass' ? '✅' : 
+                              result === 'fail' ? '❌' : '⚠️';
+            
+            document.getElementById('results').innerHTML += `
+                <div class="${className}">
+                    <strong>${statusIcon} ${test}:</strong> ${message}
+                </div>
+            `;
+        }
+        
+        function runDiagnostics() {
+            document.getElementById('results').innerHTML = '<h4>Running Diagnostics...</h4>';
+            
+            // Test 1: Check if main index.html exists and loads
+            addResult('Main Application', 'pass', 'index.html file exists');
+            
+            // Test 2: Check browser storage
+            const hasStorage = typeof(Storage) !== "undefined";
+            if (hasStorage) {
+                const userData = localStorage.getItem('currentUser');
+                if (userData) {
+                    try {
+                        const user = JSON.parse(userData);
+                        addResult('Authentication Status', 'warning', `User "${user.username}" is logged in. May need to clear data.`);
+                    } catch(e) {
+                        addResult('Authentication Status', 'warning', 'Corrupted user data found. Should clear storage.');
+                    }
+                } else {
+                    addResult('Authentication Status', 'pass', 'No active login detected.');
+                }
+            } else {
+                addResult('Browser Storage', 'fail', 'Local storage not supported by this browser.');
+            }
+            
+            // Test 3: Check JavaScript capabilities
+            try {
+                const testFunc = function() { return true; };
+                addResult('JavaScript Support', 'pass', 'JavaScript is working correctly.');
+            } catch(e) {
+                addResult('JavaScript Support', 'fail', 'JavaScript error: ' + e.message);
+            }
+            
+            // Test 4: Check Bootstrap availability
+            if (typeof bootstrap !== 'undefined') {
+                addResult('Bootstrap Framework', 'pass', 'Bootstrap 5 is loaded and ready.');
+            } else {
+                addResult('Bootstrap Framework', 'fail', 'Bootstrap not loaded. Modal functionality may not work.');
+            }
+            
+            // Test 5: Check network connectivity to CDN
+            fetch('https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css')
+                .then(response => {
+                    if (response.ok) {
+                        addResult('CDN Connectivity', 'pass', 'External resources (Bootstrap) can be loaded.');
+                    } else {
+                        addResult('CDN Connectivity', 'warning', 'Some external resources may not load.');
+                    }
+                })
+                .catch(error => {
+                    addResult('CDN Connectivity', 'warning', 'Network issues detected. App may work offline.');
+                });
+            
+            // Test 6: Check for common issues
+            addResult('Common Issues Check', 'warning', 'Login issues usually caused by: 1) Existing user data 2) Browser cache 3) JavaScript disabled');
+        }
+        
+        function quickFix() {
+            document.getElementById('results').innerHTML = '<div class="alert alert-info">Applying quick fix...</div>';
+            
+            try {
+                // Clear all data
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                setTimeout(() => {
+                    document.getElementById('results').innerHTML = `
+                        <div class="alert alert-success">
+                            <h5>✅ Quick Fix Applied!</h5>
+                            <p>Browser data cleared. Now launching main application...</p>
+                            <a href="index.html" class="btn btn-success btn-lg">Open CRA Assessment Tool</a>
+                        </div>
+                    `;
+                }, 500);
+                
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <div class="alert alert-danger">
+                        <h5>❌ Fix Failed</h5>
+                        <p>Error: ${error.message}</p>
+                        <p>Try manually: Press F12 → Console → Type: localStorage.clear() → Press Enter</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRA Tool - Access</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .access-card {
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .step {
+            border-left: 4px solid #007bff;
+            padding-left: 1rem;
+            margin: 1rem 0;
+        }
+        .status-ok { color: #28a745; }
+        .status-warning { color: #ffc107; }
+        .status-error { color: #dc3545; }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="access-card">
+            <h1 class="text-center mb-4 text-primary">CRA Assessment Tool Access</h1>
+            
+            <div class="alert alert-info">
+                <h5>Quick Fix for Login Issues</h5>
+                <p>If you're not seeing the login screen, follow these steps:</p>
+            </div>
+            
+            <div class="step">
+                <h6><span class="status-warning">Step 1:</span> Clear Browser Data</h6>
+                <p>Click the button below to clear any old login information:</p>
+                <button onclick="clearData()" class="btn btn-warning">
+                    Clear All Data
+                </button>
+            </div>
+            
+            <div class="step">
+                <h6><span class="status-ok">Step 2:</span> Open Main Application</h6>
+                <p>After clearing data, click here to open the main app:</p>
+                <a href="index.html" class="btn btn-success btn-lg">
+                    Open CRA Assessment Tool
+                </a>
+            </div>
+            
+            <div class="step">
+                <h6><span class="status-ok">Step 3:</span> Login Screen Should Appear</h6>
+                <p>You should see a login popup with three demo accounts:</p>
+            </div>
+            
+            <hr>
+            
+            <div class="text-center">
+                <h5>Demo Login Accounts</h5>
+                <div class="row g-3 mt-3">
+                    <div class="col-md-4">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <h6 class="text-primary">Admin Account</h6>
+                                <p><strong>Username:</strong> admin<br>
+                                <strong>Password:</strong> admin123</p>
+                                <small class="text-muted">Full access to all features</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-success">
+                            <div class="card-body text-center">
+                                <h6 class="text-success">Analyst Account</h6>
+                                <p><strong>Username:</strong> analyst<br>
+                                <strong>Password:</strong> analyst123</p>
+                                <small class="text-muted">Analysis and reporting features</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card border-info">
+                            <div class="card-body text-center">
+                                <h6 class="text-info">Auditor Account</h6>
+                                <p><strong>Username:</strong> auditor<br>
+                                <strong>Password:</strong> auditor123</p>
+                                <small class="text-muted">Review and audit capabilities</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <div class="alert alert-warning">
+                <h6>Common Issues & Solutions:</h6>
+                <ul>
+                    <li><strong>Login popup not appearing:</strong> Clear browser data and try again</li>
+                    <li><strong>CSV upload not working:</strong> Make sure you're logged in first</li>
+                    <li><strong>Assessments not showing:</strong> After login, select a framework to see assessments</li>
+                </ul>
+            </div>
+            
+            <div id="status" class="mt-3"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function clearData() {
+            try {
+                // Clear all browser storage
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Show success message
+                showStatus('success', '✅ Browser data cleared successfully! You can now open the main application.');
+                
+                // Auto-redirect after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+                
+            } catch (error) {
+                showStatus('error', '❌ Error clearing data: ' + error.message);
+            }
+        }
+        
+        function showStatus(type, message) {
+            const statusDiv = document.getElementById('status');
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+            statusDiv.innerHTML = `<div class="alert ${alertClass}">${message}</div>`;
+        }
+        
+        // Check if user is already authenticated
+        window.onload = function() {
+            const currentUser = localStorage.getItem('currentUser');
+            if (currentUser) {
+                showStatus('info', 'ℹ️ You appear to be already logged in. Click "Open CRA Assessment Tool" below.');
+            } else {
+                showStatus('info', 'ℹ️ No active login detected. You should see the login screen when you open the main app.');
+            }
+        };
+    </script>
+</body>
+</html>

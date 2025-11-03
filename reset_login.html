@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Force Login Reset</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .login-reset-container {
+            max-width: 500px;
+            margin: 100px auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="login-reset-container">
+            <h2 class="text-center mb-4">
+                🔑 Authentication Reset
+            </h2>
+            <p class="text-muted text-center mb-4">
+                Use this page to reset authentication and access the login screen.
+            </p>
+            
+            <!-- Status message area -->
+            <div id="status"></div>
+            
+            <div class="d-grid gap-3">
+                <button onclick="clearAndReload()" class="btn btn-danger btn-lg">
+                    🗑️ Step 1: Clear All Data
+                </button>
+                
+                <button onclick="showMainApp()" class="btn btn-primary btn-lg">
+                    🚪 Step 2: Open Main Application
+                </button>
+                
+                <div class="alert alert-info mt-3">
+                    <strong>Instructions:</strong>
+                    <ol class="mb-0 mt-2">
+                        <li><strong>Click "Clear All Data"</strong> - This removes old login information</li>
+                        <li><strong>Click "Open Main Application"</strong> - This takes you to the main app</li>
+                        <li><strong>Login screen should appear</strong> - Use demo accounts below</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <div class="text-center">
+                <h5 class="mb-3">Demo Login Accounts</h5>
+                <div class="row g-2">
+                    <div class="col-4">
+                        <div class="card border-primary">
+                            <div class="card-body text-center p-2">
+                                <strong class="text-primary">Admin</strong><br>
+                                <small class="text-muted">admin/admin123</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card border-success">
+                            <div class="card-body text-center p-2">
+                                <strong class="text-success">Analyst</strong><br>
+                                <small class="text-muted">analyst/analyst123</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card border-info">
+                            <div class="card-body text-center p-2">
+                                <strong class="text-info">Auditor</strong><br>
+                                <small class="text-muted">auditor/auditor123</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function clearAndReload() {
+            console.log('🧹 Clearing all data and forcing login...');
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Show success message
+            alert('✅ Authentication cleared! Please click "Open Main Application" button below to reload the app.');
+            
+            // Update status message
+            const statusDiv = document.getElementById('status');
+            if (statusDiv) {
+                statusDiv.innerHTML = '<div class="alert alert-success">✅ Authentication cleared! Click "Open Main Application" below.</div>';
+            }
+        }
+        
+        function showMainApp() {
+            // Try to find the index.html file in different possible locations
+            const possiblePaths = [
+                'index.html',
+                'enhanced_cra_tool/index.html',
+                './enhanced_cra_tool/index.html'
+            ];
+            
+            let loaded = false;
+            for (let path of possiblePaths) {
+                try {
+                    // Check if file exists by creating a test link
+                    const testLink = document.createElement('a');
+                    testLink.href = path;
+                    console.log('Trying path:', testLink.href);
+                    
+                    // If we can construct the link, try to navigate
+                    window.location.href = testLink.href;
+                    loaded = true;
+                    break;
+                } catch(e) {
+                    console.log('Failed path:', path, e);
+                }
+            }
+            
+            if (!loaded) {
+                alert('Could not find the main application file. Please manually open index.html in the enhanced_cra_tool folder.');
+            }
+        }
+        
+        // Check current storage status
+        console.log('📊 Current localStorage keys:', Object.keys(localStorage));
+    </script>
+</body>
+</html>
